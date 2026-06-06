@@ -3,199 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 <title>Patent Element Inspector</title>
 <script src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#f7f8fa;--bg2:#fff;--bg3:#f0f2f5;--bg4:#e8ebf0;
-  --brd:#e2e5ea;--brd2:#cdd2da;
-  --tx:#1a1d23;--tx2:#5c6370;--tx3:#9099a6;
-  --acc:#2563eb;--acc2:#1d4ed8;--acc-bg:rgba(37,99,235,.06);--acc-brd:rgba(37,99,235,.15);
-  --green:#16a34a;--green-bg:rgba(22,163,74,.06);--green-brd:rgba(22,163,74,.15);
-  --yellow:#d97706;--yellow-bg:rgba(217,119,6,.06);--yellow-brd:rgba(217,119,6,.15);
-  --red:#dc2626;--red-bg:rgba(220,38,38,.06);
-  --pink:#db2777;--pink-bg:rgba(219,39,119,.06);--pink-brd:rgba(219,39,119,.15);
-  --blue:#0891b2;--blue-bg:rgba(8,145,178,.06);--blue-brd:rgba(8,145,178,.15);
-  --radius:6px
-}
-body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:var(--tx);font-size:12px;line-height:1.5;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+body{font-family:'Segoe UI',-apple-system,sans-serif;background:#f7f8fa;color:#1a1d23;font-size:12px;line-height:1.5;height:100vh;overflow:hidden;display:-ms-flexbox;display:flex;-ms-flex-direction:column;flex-direction:column}
 
 /* Header */
-.header{background:#1e293b;padding:10px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0}
-.header .icon{width:24px;height:24px;background:var(--acc);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:700}
+.header{background:#1e293b;padding:10px 14px;display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;-ms-flex-negative:0;flex-shrink:0}
+.header .icon{width:24px;height:24px;background:#2563eb;border-radius:5px;display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;-ms-flex-pack:center;justify-content:center;font-size:12px;color:#fff;font-weight:700;margin-right:8px}
 .header .title{font-size:12px;font-weight:600;color:#e2e8f0}
 .header .ver{font-size:8px;color:#64748b;margin-left:auto}
-.header .status-dot{width:6px;height:6px;border-radius:50%;margin-left:4px}
-.header .status-dot.ok{background:#22c55e;animation:pulse 2s infinite}
+.header .status-dot{width:6px;height:6px;border-radius:50%;margin-left:4px;display:inline-block}
+.header .status-dot.ok{background:#22c55e}
 .header .status-dot.err{background:#ef4444}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* Tabs */
-.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--brd);padding:0 4px;flex-shrink:0}
-.tab{flex:1;padding:8px 0;font-size:10px;font-weight:500;color:var(--tx3);text-align:center;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .12s}
-.tab:hover{color:var(--tx2);background:var(--bg3)}
-.tab.active{color:var(--acc);border-bottom-color:var(--acc);font-weight:600}
-.tab .badge{display:inline-block;font-size:7px;padding:1px 4px;border-radius:8px;background:var(--red);color:#fff;margin-left:2px;font-weight:600}
+.tabs{display:-ms-flexbox;display:flex;background:#fff;border-bottom:1px solid #e2e5ea;padding:0 4px;-ms-flex-negative:0;flex-shrink:0}
+.tab{-ms-flex:1;flex:1;padding:8px 0;font-size:10px;font-weight:500;color:#9099a6;text-align:center;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent}
+.tab:hover{color:#5c6370;background:#f0f2f5}
+.tab.active{color:#2563eb;border-bottom-color:#2563eb;font-weight:600}
+.tab .badge{display:inline-block;font-size:7px;padding:1px 4px;border-radius:8px;background:#dc2626;color:#fff;margin-left:2px;font-weight:600}
 
 /* Tab content */
-.panel{display:none;flex:1;overflow-y:auto;flex-direction:column}.panel.active{display:flex}
+.panel{display:none;-ms-flex:1;flex:1;overflow-y:auto;-ms-flex-direction:column;flex-direction:column}.panel.active{display:-ms-flexbox;display:flex}
 
 /* Add from selection */
-.sel-bar{padding:8px 10px;background:var(--acc-bg);border-bottom:1px solid var(--acc-brd);display:flex;align-items:center;gap:6px}
-.sel-bar .sel-text{flex:1;font-size:10px;color:var(--acc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sel-bar .sel-btn{padding:4px 10px;background:var(--acc);color:#fff;border:none;border-radius:4px;font-size:9px;font-weight:600;cursor:pointer;white-space:nowrap}
-.sel-bar .sel-btn:hover{background:var(--acc2)}
-.sel-bar .sel-btn:disabled{background:var(--bg4);color:var(--tx3);cursor:default}
+.sel-bar{padding:8px 10px;background:rgba(37,99,235,.06);border-bottom:1px solid rgba(37,99,235,.15);display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center}
+.sel-bar .sel-text{-ms-flex:1;flex:1;font-size:10px;color:#2563eb;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:6px}
+.sel-bar .sel-icon{font-size:11px;margin-right:6px}
+.sel-bar .sel-btn{padding:4px 10px;background:#2563eb;color:#fff;border:none;border-radius:4px;font-size:9px;font-weight:600;cursor:pointer;white-space:nowrap}
+.sel-bar .sel-btn:hover{background:#1d4ed8}
+.sel-bar .sel-btn:disabled{background:#e8ebf0;color:#9099a6;cursor:default}
 
 /* Add form */
-.add-form{padding:8px 10px;background:var(--bg2);border-bottom:1px solid var(--brd);display:flex;gap:5px}
-.add-form input{border:1px solid var(--brd2);border-radius:5px;padding:5px 7px;font-size:10px;background:var(--bg);color:var(--tx);outline:none;font-family:inherit}
-.add-form input:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(37,99,235,.08)}
-.num-input{width:48px;font-family:'Cascadia Code','Consolas',monospace;text-align:center}
-.name-input{flex:1;min-width:0}
-.add-btn{padding:5px 10px;background:var(--acc);color:#fff;border:none;border-radius:5px;font-size:9px;font-weight:600;cursor:pointer;white-space:nowrap}
-.add-btn:hover{background:var(--acc2)}
+.add-form{padding:8px 10px;background:#fff;border-bottom:1px solid #e2e5ea;display:-ms-flexbox;display:flex}
+.add-form input{border:1px solid #cdd2da;border-radius:5px;padding:5px 7px;font-size:10px;background:#f7f8fa;color:#1a1d23;outline:none;font-family:inherit}
+.add-form input:focus{border-color:#2563eb}
+.num-input{width:48px;font-family:'Consolas',monospace;text-align:center;margin-right:5px}
+.name-input{-ms-flex:1;flex:1;margin-right:5px}
+.add-btn{padding:5px 10px;background:#2563eb;color:#fff;border:none;border-radius:5px;font-size:9px;font-weight:600;cursor:pointer;white-space:nowrap}
+.add-btn:hover{background:#1d4ed8}
+
+/* Quick Insert */
+.qi-box{padding:8px 10px;background:rgba(8,145,178,.06);border-bottom:1px solid rgba(8,145,178,.15)}
+.qi-label{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#0891b2;margin-bottom:4px}
+.qi-row{display:-ms-flexbox;display:flex;position:relative}
+.qi-input{-ms-flex:1;flex:1;padding:5px 8px;font-size:11px;border:1px solid #cdd2da;border-radius:4px;background:#fff;color:#1a1d23;outline:none;font-family:'Consolas',monospace;margin-right:4px}
+.qi-input:focus{border-color:#0891b2}
+.qi-insert-btn{padding:5px 10px;background:#0891b2;color:#fff;border:none;border-radius:4px;font-size:9px;font-weight:600;cursor:pointer;white-space:nowrap}
+.qi-insert-btn:hover{background:#0e7490}
+.qi-insert-btn:disabled{background:#e8ebf0;color:#9099a6;cursor:default}
+.qi-dropdown{position:absolute;top:100%;left:0;right:50px;background:#fff;border:1px solid #cdd2da;border-radius:4px;z-index:50;max-height:160px;overflow-y:auto;display:none;margin-top:2px}
+.qi-dropdown.show{display:block}
+.qi-item{padding:5px 8px;cursor:pointer;display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;font-size:10px;border-bottom:1px solid #f0f2f5}
+.qi-item:last-child{border-bottom:none}
+.qi-item:hover,.qi-item.selected{background:rgba(8,145,178,.06)}
+.qi-item .qi-num{font-family:monospace;font-weight:700;color:#0891b2;min-width:28px;margin-right:6px}
+.qi-item .qi-name{color:#1a1d23;-ms-flex:1;flex:1}
 
 /* Search + Filter */
-.search-bar{padding:5px 10px;background:var(--bg2);border-bottom:1px solid var(--brd)}
-.search-bar input{width:100%;padding:5px 7px;font-size:10px;border:1px solid var(--brd);border-radius:4px;background:var(--bg);color:var(--tx);outline:none}
-.search-bar input:focus{border-color:var(--acc)}
-.filter-bar{display:flex;padding:5px 10px;gap:3px;background:var(--bg2);border-bottom:1px solid var(--brd)}
-.fbtn{padding:2px 7px;font-size:8px;border:1px solid var(--brd);border-radius:3px;background:var(--bg);color:var(--tx2);cursor:pointer;font-weight:500}
-.fbtn:hover{border-color:var(--acc);color:var(--acc)}
-.fbtn.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+.search-bar{padding:5px 10px;background:#fff;border-bottom:1px solid #e2e5ea}
+.search-bar input{width:100%;padding:5px 7px;font-size:10px;border:1px solid #e2e5ea;border-radius:4px;background:#f7f8fa;color:#1a1d23;outline:none}
+.search-bar input:focus{border-color:#2563eb}
+.filter-bar{display:-ms-flexbox;display:flex;padding:5px 10px;background:#fff;border-bottom:1px solid #e2e5ea}
+.fbtn{padding:2px 7px;font-size:8px;border:1px solid #e2e5ea;border-radius:3px;background:#f7f8fa;color:#5c6370;cursor:pointer;font-weight:500;margin-right:3px}
+.fbtn:hover{border-color:#2563eb;color:#2563eb}
+.fbtn.active{background:#2563eb;color:#fff;border-color:#2563eb}
 .fbtn .cnt{font-family:monospace;font-size:7px;margin-left:2px;opacity:.7}
 
 /* Element list */
-.elem-list{flex:1;overflow-y:auto;padding:2px 0}
-.elem-row{display:flex;align-items:center;padding:6px 10px;gap:6px;cursor:pointer;border-bottom:1px solid var(--bg3);transition:background .08s;border-left:3px solid transparent}
-.elem-row:hover{background:var(--bg3)}
-.elem-row.active{background:var(--acc-bg);border-left-color:var(--acc)}
-.elem-row.manual{border-left-color:var(--green)}
-.elem-row.active.manual{border-left-color:var(--acc)}
-.e-num{font-family:'Cascadia Code','Consolas',monospace;font-size:12px;font-weight:700;color:var(--acc);min-width:32px}
-.e-info{flex:1;min-width:0}
-.e-name{font-size:10px;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.e-meta{font-size:8px;color:var(--tx3)}
-.e-badges{display:flex;gap:2px;flex-shrink:0}
-.bsm{font-size:7px;padding:1px 4px;border-radius:3px;font-weight:600}
-.b-manual{background:var(--green-bg);color:var(--green);border:1px solid var(--green-brd)}
-.b-issue{background:var(--red-bg);color:var(--red);border:1px solid rgba(220,38,38,.15)}
-.b-ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-brd)}
-.e-go{font-size:9px;color:var(--tx3);cursor:pointer;padding:2px}
-.e-go:hover{color:var(--acc)}
+.elem-list{-ms-flex:1;flex:1;overflow-y:auto;padding:2px 0}
+.elem-row{display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;padding:6px 10px;cursor:pointer;border-bottom:1px solid #f0f2f5;border-left:3px solid transparent}
+.elem-row:hover{background:#f0f2f5}
+.elem-row.active{background:rgba(37,99,235,.06);border-left-color:#2563eb}
+.elem-row.manual{border-left-color:#16a34a}
+.elem-row.active.manual{border-left-color:#2563eb}
+.e-num{font-family:'Consolas',monospace;font-size:12px;font-weight:700;color:#2563eb;min-width:32px;margin-right:6px}
+.e-info{-ms-flex:1;flex:1;min-width:0}
+.e-name{font-size:10px;font-weight:500;color:#1a1d23;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.e-meta{font-size:8px;color:#9099a6}
+.e-badges{display:-ms-flexbox;display:flex;margin-left:4px}
+.bsm{font-size:7px;padding:1px 4px;border-radius:3px;font-weight:600;margin-left:2px}
+.b-manual{background:rgba(22,163,74,.06);color:#16a34a;border:1px solid rgba(22,163,74,.15)}
+.b-issue{background:rgba(220,38,38,.06);color:#dc2626;border:1px solid rgba(220,38,38,.15)}
+.b-ok{background:rgba(22,163,74,.06);color:#16a34a;border:1px solid rgba(22,163,74,.15)}
+.e-go{font-size:9px;color:#9099a6;cursor:pointer;padding:2px;margin-left:4px}
+.e-go:hover{color:#2563eb}
 
 /* Detail */
-.detail{background:var(--bg2);border-top:1px solid var(--brd);max-height:0;overflow:hidden;transition:max-height .25s}
+.detail{background:#fff;border-top:1px solid #e2e5ea;max-height:0;overflow:hidden}
 .detail.open{max-height:420px;overflow-y:auto}
 .detail-inner{padding:10px}
-.dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.dh-num{font-family:monospace;font-size:18px;font-weight:700;color:var(--acc)}
-.dh-actions{display:flex;gap:4px}
-.dh-close{width:22px;height:22px;display:flex;align-items:center;justify-content:center;border:none;background:var(--bg3);border-radius:4px;cursor:pointer;color:var(--tx3);font-size:12px}
-.dh-close:hover{background:var(--bg4);color:var(--tx)}
+.dh{display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;-ms-flex-pack:justify;justify-content:space-between;margin-bottom:8px}
+.dh-num{font-family:monospace;font-size:18px;font-weight:700;color:#2563eb}
+.dh-actions{display:-ms-flexbox;display:flex}
+.dh-close{width:22px;height:22px;display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;-ms-flex-pack:center;justify-content:center;border:none;background:#f0f2f5;border-radius:4px;cursor:pointer;color:#9099a6;font-size:12px;margin-left:4px}
+.dh-close:hover{background:#e8ebf0;color:#1a1d23}
 .fg{margin-bottom:8px}
-.fl{font-size:8px;text-transform:uppercase;letter-spacing:.7px;color:var(--tx3);font-weight:600;margin-bottom:2px}
-.fi{width:100%;padding:4px 7px;font-size:10px;border:1px solid var(--brd);border-radius:4px;background:var(--bg);color:var(--tx);outline:none;font-family:inherit}
-.fi:focus{border-color:var(--acc)}
-.fh{font-size:8px;color:var(--tx3);margin-top:1px}
-.old-tag{display:inline-flex;align-items:center;gap:2px;padding:2px 6px;border-radius:3px;font-size:8px;font-weight:500;background:var(--pink-bg);color:var(--pink);border:1px solid var(--pink-brd);margin:2px 2px 0 0}
+.fl{font-size:8px;text-transform:uppercase;letter-spacing:.7px;color:#9099a6;font-weight:600;margin-bottom:2px}
+.fi{width:100%;padding:4px 7px;font-size:10px;border:1px solid #e2e5ea;border-radius:4px;background:#f7f8fa;color:#1a1d23;outline:none;font-family:inherit}
+.fi:focus{border-color:#2563eb}
+.fh{font-size:8px;color:#9099a6;margin-top:1px}
+.old-tag{display:inline-block;padding:2px 6px;border-radius:3px;font-size:8px;font-weight:500;background:rgba(219,39,119,.06);color:#db2777;border:1px solid rgba(219,39,119,.15);margin:2px 2px 0 0}
 .old-tag .old-x{cursor:pointer;opacity:.5;font-size:7px;margin-left:2px}
 .old-tag .old-x:hover{opacity:1}
-.d-fig{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
-.d-fig-tag{padding:2px 7px;border-radius:3px;font-size:8px;font-weight:500;background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-brd)}
+.d-fig{margin-top:4px}
+.d-fig-tag{display:inline-block;padding:2px 7px;border-radius:3px;font-size:8px;font-weight:500;background:rgba(8,145,178,.06);color:#0891b2;border:1px solid rgba(8,145,178,.15);margin:2px 2px 0 0}
 
 /* Inspection */
-.insp-actions{padding:10px;display:flex;gap:6px}
-.insp-btn{flex:1;padding:10px;border:none;border-radius:var(--radius);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
-.insp-btn.run{background:var(--acc);color:#fff}
-.insp-btn.run:hover{background:var(--acc2)}
-.insp-btn.clear{background:var(--bg3);color:var(--tx2);border:1px solid var(--brd)}
-.insp-btn.clear:hover{background:var(--bg4);color:var(--tx)}
-.insp-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 10px;background:var(--bg2);border-bottom:1px solid var(--brd)}
-.istat{text-align:center;padding:6px;border-radius:var(--radius);background:var(--bg)}
-.istat .n{font-family:monospace;font-size:16px;font-weight:700}.istat .l{font-size:7px;text-transform:uppercase;color:var(--tx3)}
-.issue-item{padding:8px 10px;border-bottom:1px solid var(--bg3);cursor:pointer;display:flex;align-items:flex-start;gap:8px}
-.issue-item:hover{background:var(--bg3)}
-.issue-icon{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;margin-top:1px}
-.issue-icon.old{background:var(--pink-bg);color:var(--pink)}
-.issue-icon.mis{background:var(--red-bg);color:var(--red)}
-.issue-icon.orp{background:var(--yellow-bg);color:var(--yellow)}
-.issue-body{flex:1;min-width:0}
+.insp-actions{padding:10px;display:-ms-flexbox;display:flex}
+.insp-btn{-ms-flex:1;flex:1;padding:10px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
+.insp-btn.run{background:#2563eb;color:#fff;margin-right:6px}
+.insp-btn.run:hover{background:#1d4ed8}
+.insp-btn.clear{background:#f0f2f5;color:#5c6370;border:1px solid #e2e5ea}
+.insp-btn.clear:hover{background:#e8ebf0;color:#1a1d23}
+.insp-summary{display:-ms-flexbox;display:flex;padding:8px 10px;background:#fff;border-bottom:1px solid #e2e5ea}
+.istat{-ms-flex:1;flex:1;text-align:center;padding:6px;border-radius:6px;background:#f7f8fa;margin-right:6px}
+.istat:last-child{margin-right:0}
+.istat .n{font-family:monospace;font-size:16px;font-weight:700}.istat .l{font-size:7px;text-transform:uppercase;color:#9099a6}
+.issue-item{padding:8px 10px;border-bottom:1px solid #f0f2f5;cursor:pointer;display:-ms-flexbox;display:flex;-ms-flex-align:start;align-items:flex-start}
+.issue-item:hover{background:#f0f2f5}
+.issue-icon{width:18px;height:18px;border-radius:4px;display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;-ms-flex-pack:center;justify-content:center;font-size:8px;font-weight:700;-ms-flex-negative:0;flex-shrink:0;margin-top:1px;margin-right:8px}
+.issue-icon.old{background:rgba(219,39,119,.06);color:#db2777}
+.issue-icon.mis{background:rgba(220,38,38,.06);color:#dc2626}
+.issue-icon.orp{background:rgba(217,119,6,.06);color:#d97706}
+.issue-body{-ms-flex:1;flex:1;min-width:0}
 .it{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.it.old{color:var(--pink)}.it.mis{color:var(--red)}.it.orp{color:var(--yellow)}
-.id{font-size:10px;color:var(--tx);margin-top:1px}
+.it.old{color:#db2777}.it.mis{color:#dc2626}.it.orp{color:#d97706}
+.id{font-size:10px;color:#1a1d23;margin-top:1px}
 .id strong{font-family:monospace}
-.issue-go{font-size:8px;color:var(--tx3);padding:2px 5px;border:1px solid var(--brd);border-radius:3px;cursor:pointer;flex-shrink:0;margin-top:2px}
-.issue-go:hover{border-color:var(--acc);color:var(--acc)}
-
-/* Quick Insert */
-.qi-box{padding:8px 10px;background:var(--blue-bg);border-bottom:1px solid var(--blue-brd)}
-.qi-label{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:4px;display:flex;align-items:center;gap:4px}
-.qi-row{display:flex;gap:4px;position:relative}
-.qi-input{flex:1;padding:5px 8px;font-size:11px;border:1px solid var(--brd2);border-radius:4px;background:var(--bg2);color:var(--tx);outline:none;font-family:'Cascadia Code','Consolas',monospace}
-.qi-input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(8,145,178,.1)}
-.qi-insert-btn{padding:5px 10px;background:var(--blue);color:#fff;border:none;border-radius:4px;font-size:9px;font-weight:600;cursor:pointer;white-space:nowrap}
-.qi-insert-btn:hover{background:#0e7490}
-.qi-insert-btn:disabled{background:var(--bg4);color:var(--tx3);cursor:default}
-.qi-dropdown{position:absolute;top:100%;left:0;right:50px;background:var(--bg2);border:1px solid var(--brd2);border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:50;max-height:160px;overflow-y:auto;display:none;margin-top:2px}
-.qi-dropdown.show{display:block}
-.qi-item{padding:5px 8px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:10px;border-bottom:1px solid var(--bg3)}
-.qi-item:last-child{border-bottom:none}
-.qi-item:hover,.qi-item.selected{background:var(--blue-bg)}
-.qi-item .qi-num{font-family:monospace;font-weight:700;color:var(--blue);min-width:28px}
-.qi-item .qi-name{color:var(--tx);flex:1}
+.issue-go{font-size:8px;color:#9099a6;padding:2px 5px;border:1px solid #e2e5ea;border-radius:3px;cursor:pointer;-ms-flex-negative:0;flex-shrink:0;margin-top:2px;margin-left:6px}
+.issue-go:hover{border-color:#2563eb;color:#2563eb}
 
 /* Figures */
-.fig-header{padding:10px;border-bottom:1px solid var(--brd)}
-.fig-add{display:flex;gap:4px}
-.fig-add input{flex:1;padding:5px 7px;font-size:10px;border:1px solid var(--brd2);border-radius:4px;background:var(--bg);color:var(--tx);outline:none;font-family:inherit}
-.fig-add input:focus{border-color:var(--acc)}
-.fig-list{flex:1;overflow-y:auto}
-.fig-row{padding:8px 10px;border-bottom:1px solid var(--bg3);cursor:pointer}
-.fig-row:hover{background:var(--bg3)}
-.fig-row.active{background:var(--acc-bg);border-left:3px solid var(--acc)}
-.fig-name{font-size:11px;font-weight:600;color:var(--tx)}
-.fig-count{font-size:8px;color:var(--tx3);margin-top:1px}
+.fig-header{padding:10px;border-bottom:1px solid #e2e5ea}
+.fig-add{display:-ms-flexbox;display:flex}
+.fig-add input{-ms-flex:1;flex:1;padding:5px 7px;font-size:10px;border:1px solid #cdd2da;border-radius:4px;background:#f7f8fa;color:#1a1d23;outline:none;font-family:inherit;margin-right:4px}
+.fig-add input:focus{border-color:#2563eb}
+.fig-list{-ms-flex:1;flex:1;overflow-y:auto}
+.fig-row{padding:8px 10px;border-bottom:1px solid #f0f2f5;cursor:pointer}
+.fig-row:hover{background:#f0f2f5}
+.fig-row.active{background:rgba(37,99,235,.06);border-left:3px solid #2563eb}
+.fig-name{font-size:11px;font-weight:600;color:#1a1d23}
+.fig-count{font-size:8px;color:#9099a6;margin-top:1px}
 .fig-elems{padding:4px 10px 8px 20px}
-.fig-elem{display:flex;align-items:center;gap:5px;padding:3px 0;font-size:9px;color:var(--tx2);cursor:pointer}
-.fig-elem:hover{color:var(--acc)}
-.fig-elem .fe-num{font-family:monospace;font-weight:700;color:var(--acc);min-width:24px}
-.fig-empty{padding:20px;text-align:center;color:var(--tx3);font-size:10px}
+.fig-elem{display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;padding:3px 0;font-size:9px;color:#5c6370;cursor:pointer}
+.fig-elem:hover{color:#2563eb}
+.fig-elem .fe-num{font-family:monospace;font-weight:700;color:#2563eb;min-width:24px;margin-right:5px}
+.fig-empty{padding:20px;text-align:center;color:#9099a6;font-size:10px}
 
 /* Config */
 .cfg-section{padding:12px}
-.cfg-title{font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px;display:flex;align-items:center;gap:5px}
-.cfg-row{display:flex;gap:6px;margin-bottom:8px}
-.cfg-btn{flex:1;padding:8px;border-radius:var(--radius);font-size:10px;font-weight:500;cursor:pointer;text-align:center;border:1px solid var(--brd);background:var(--bg2);color:var(--tx)}
-.cfg-btn:hover{border-color:var(--acc);color:var(--acc)}
-.cfg-btn.primary{background:var(--acc);color:#fff;border-color:var(--acc)}
-.cfg-btn.primary:hover{background:var(--acc2)}
-.cfg-btn.danger{color:var(--red);border-color:rgba(220,38,38,.2)}
-.cfg-btn.danger:hover{background:var(--red-bg);border-color:var(--red)}
-.cfg-hl{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bg3);font-size:10px}
+.cfg-title{font-size:10px;font-weight:600;text-transform:uppercase;color:#5c6370;margin-bottom:8px}
+.cfg-row{display:-ms-flexbox;display:flex;margin-bottom:8px}
+.cfg-btn{-ms-flex:1;flex:1;padding:8px;border-radius:6px;font-size:10px;font-weight:500;cursor:pointer;text-align:center;border:1px solid #e2e5ea;background:#fff;color:#1a1d23;margin-right:6px}
+.cfg-btn:last-child{margin-right:0}
+.cfg-btn:hover{border-color:#2563eb;color:#2563eb}
+.cfg-btn.primary{background:#2563eb;color:#fff;border-color:#2563eb}
+.cfg-btn.primary:hover{background:#1d4ed8}
+.cfg-btn.danger{color:#dc2626;border-color:rgba(220,38,38,.2)}
+.cfg-btn.danger:hover{background:rgba(220,38,38,.06);border-color:#dc2626}
+.cfg-hl{display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;padding:6px 0;border-bottom:1px solid #f0f2f5;font-size:10px}
 .cfg-hl:last-child{border-bottom:none}
-.cfg-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0}
-.cfg-hl-label{flex:1;color:var(--tx2)}
-.cfg-hl-val{font-size:9px;font-family:monospace;color:var(--tx3)}
-.cfg-about{font-size:10px;color:var(--tx2);line-height:1.7;margin-top:4px}
-.cfg-sep{height:1px;background:var(--brd);margin:4px 0 12px}
+.cfg-dot{width:14px;height:14px;border-radius:3px;-ms-flex-negative:0;flex-shrink:0;margin-right:8px}
+.cfg-hl-label{-ms-flex:1;flex:1;color:#5c6370}
+.cfg-hl-val{font-size:9px;font-family:monospace;color:#9099a6}
+.cfg-about{font-size:10px;color:#5c6370;line-height:1.7;margin-top:4px}
+.cfg-sep{height:1px;background:#e2e5ea;margin:4px 0 12px}
 
 /* Statusbar */
-.statusbar{padding:5px 10px;background:var(--bg2);border-top:1px solid var(--brd);font-size:8px;color:var(--tx3);display:flex;justify-content:space-between;flex-shrink:0}
+.statusbar{padding:5px 10px;background:#fff;border-top:1px solid #e2e5ea;font-size:8px;color:#9099a6;display:-ms-flexbox;display:flex;-ms-flex-pack:justify;justify-content:space-between;-ms-flex-negative:0;flex-shrink:0}
 
 /* Toast */
-.toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#1e293b;color:#e2e8f0;padding:6px 16px;border-radius:6px;font-size:10px;font-weight:500;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
-.toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
-
-/* Scrollbar */
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--brd2);border-radius:2px}
+.toast{position:fixed;bottom:40px;left:50%;margin-left:-100px;width:200px;text-align:center;background:#1e293b;color:#e2e8f0;padding:6px 16px;border-radius:6px;font-size:10px;font-weight:500;z-index:100;display:none}
+.toast.show{display:block}
 
 /* Empty state */
-.empty-state{padding:30px 20px;text-align:center;color:var(--tx3)}
+.empty-state{padding:30px 20px;text-align:center;color:#9099a6}
 .empty-state .empty-icon{font-size:24px;margin-bottom:6px;opacity:.4}
 .empty-state .empty-text{font-size:10px;line-height:1.6}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#cdd2da;border-radius:2px}
 </style>
 </head>
 <body>
@@ -203,7 +194,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.2</div>
+  <div class="ver">v0.2.1</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
@@ -217,21 +208,20 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <!-- ELEMENTS -->
 <div class="panel active" id="p-elements">
   <div class="sel-bar">
-    <span style="font-size:11px">&#10022;</span>
+    <span class="sel-icon">&#10022;</span>
     <span class="sel-text" id="selText">Select text in document...</span>
     <button class="sel-btn" id="selBtn" onclick="addFromSelection()" disabled>+ Add Selected</button>
   </div>
   <div class="add-form">
-    <input class="num-input" placeholder="#" id="addNum" maxlength="5" onkeydown="if(event.key==='Enter')addManual()">
-    <input class="name-input" placeholder="Element name..." id="addName" onkeydown="if(event.key==='Enter')addManual()">
+    <input class="num-input" placeholder="#" id="addNum" maxlength="5" onkeydown="if(event.keyCode===13)addManual()">
+    <input class="name-input" placeholder="Element name..." id="addName" onkeydown="if(event.keyCode===13)addManual()">
     <button class="add-btn" onclick="addManual()">Add</button>
   </div>
 
-  <!-- Quick Insert -->
   <div class="qi-box">
-    <div class="qi-label">&#9889; Quick Insert <span style="font-weight:400;opacity:.7">type $ + number</span></div>
+    <div class="qi-label">&#9889; Quick Insert &mdash; type $ + number</div>
     <div class="qi-row">
-      <input class="qi-input" id="qiInput" placeholder="$50 → device 50" oninput="onQiInput()" onkeydown="onQiKey(event)">
+      <input class="qi-input" id="qiInput" placeholder="$50 = device 50" oninput="onQiInput()" onkeydown="onQiKey(event)">
       <button class="qi-insert-btn" id="qiBtn" onclick="qiInsert()" disabled>Insert</button>
       <div class="qi-dropdown" id="qiDropdown"></div>
     </div>
@@ -262,7 +252,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="panel" id="p-figures">
   <div class="fig-header">
     <div class="fig-add">
-      <input placeholder="FIG. 1" id="figAddInput" onkeydown="if(event.key==='Enter')addFigure()">
+      <input placeholder="FIG. 1" id="figAddInput" onkeydown="if(event.keyCode===13)addFigure()">
       <button class="add-btn" onclick="addFigure()">+ Add</button>
     </div>
   </div>
@@ -272,7 +262,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <!-- CONFIG -->
 <div class="panel" id="p-config">
   <div class="cfg-section">
-    <div class="cfg-title">&#128193; Data</div>
+    <div class="cfg-title">Data</div>
     <div class="cfg-row">
       <button class="cfg-btn primary" onclick="exportJSON()">Export JSON</button>
       <button class="cfg-btn" onclick="document.getElementById('importFile').click()">Import JSON</button>
@@ -284,19 +274,19 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
     </div>
 
     <div class="cfg-sep"></div>
-    <div class="cfg-title">&#127912; Highlight Colors</div>
+    <div class="cfg-title">Highlight Colors</div>
     <div class="cfg-hl"><div class="cfg-dot" style="background:#00ff00"></div><div class="cfg-hl-label">Official match</div><div class="cfg-hl-val">BrightGreen</div></div>
     <div class="cfg-hl"><div class="cfg-dot" style="background:#ffff00"></div><div class="cfg-hl-label">Variant match</div><div class="cfg-hl-val">Yellow</div></div>
     <div class="cfg-hl"><div class="cfg-dot" style="background:#ff69b4"></div><div class="cfg-hl-label">Old name (issue)</div><div class="cfg-hl-val">Pink</div></div>
     <div class="cfg-hl"><div class="cfg-dot" style="background:#40e0d0"></div><div class="cfg-hl-label">Unregistered</div><div class="cfg-hl-val">Turquoise</div></div>
 
     <div class="cfg-sep"></div>
-    <div class="cfg-title">&#9432; About</div>
+    <div class="cfg-title">About</div>
     <div class="cfg-about">
-      Patent Element Inspector v0.2<br>
+      Patent Element Inspector v0.2.1<br>
       Office Add-in for Word<br>
-      Register, manage, and inspect patent elements.<br>
-      <span style="color:var(--tx3)">github.com/jinny8113/pei</span>
+      Compatible with Office 2019 &amp; 365<br>
+      <span style="color:#9099a6">github.com/jinny8113/pei</span>
     </div>
   </div>
 </div>
@@ -309,6 +299,47 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="toast" id="toast"></div>
 
 <script>
+// ============================================================
+// IE11 POLYFILLS
+// ============================================================
+if (!Array.prototype.find) {
+  Array.prototype.find = function(fn) {
+    for (var i = 0; i < this.length; i++) { if (fn(this[i], i, this)) return this[i]; }
+    return undefined;
+  };
+}
+if (!Array.prototype.filter) {
+  Array.prototype.filter = function(fn) {
+    var r = [];
+    for (var i = 0; i < this.length; i++) { if (fn(this[i], i, this)) r.push(this[i]); }
+    return r;
+  };
+}
+if (!Array.prototype.map) {
+  Array.prototype.map = function(fn) {
+    var r = [];
+    for (var i = 0; i < this.length; i++) { r.push(fn(this[i], i, this)); }
+    return r;
+  };
+}
+if (!Array.prototype.forEach) {
+  Array.prototype.forEach = function(fn) {
+    for (var i = 0; i < this.length; i++) { fn(this[i], i, this); }
+  };
+}
+if (!String.prototype.startsWith) {
+  String.prototype.startsWith = function(s) { return this.indexOf(s) === 0; };
+}
+if (!String.prototype.trim) {
+  String.prototype.trim = function() { return this.replace(/^\s+|\s+$/g, ''); };
+}
+
+// Helper: querySelectorAll forEach (IE11 NodeList has no forEach)
+function qsaEach(sel, fn) {
+  var nodes = document.querySelectorAll(sel);
+  for (var i = 0; i < nodes.length; i++) { fn(nodes[i], i); }
+}
+
 // ============================================================
 // STATE
 // ============================================================
@@ -348,7 +379,7 @@ setTimeout(function(){
 }, 3000);
 
 // ============================================================
-// SELECTION — Read selected text from Word
+// SELECTION
 // ============================================================
 function checkSelection() {
   if (!officeReady) return;
@@ -360,7 +391,8 @@ function checkSelection() {
       var btn = document.getElementById('selBtn');
       var label = document.getElementById('selText');
       if (text && text.length > 2) {
-        label.textContent = '\u201c' + (text.length > 40 ? text.substring(0, 40) + '...' : text) + '\u201d';
+        var display = text.length > 40 ? text.substring(0, 40) + '...' : text;
+        label.textContent = '"' + display + '"';
         label.style.fontWeight = '600';
         btn.disabled = false;
       } else {
@@ -380,9 +412,8 @@ function addFromSelection() {
     return ctx.sync().then(function() {
       var text = (sel.text || '').trim();
       if (!text) return;
-      // Try "name number" or "number name" patterns
       var m = text.match(/^(.+?)\s+(\d{2,4}[A-Za-z]?)$/i) || text.match(/^(\d{2,4}[A-Za-z]?)\s+(.+)$/i);
-      if (!m) { toast('Cannot parse: \u201c' + text + '\u201d'); return; }
+      if (!m) { toast('Cannot parse: "' + text + '"'); return; }
       var num, name;
       if (/^\d/.test(m[1])) { num = m[1]; name = m[2]; } else { name = m[1]; num = m[2]; }
       name = name.toLowerCase().trim();
@@ -393,7 +424,7 @@ function addFromSelection() {
           ex.oldNames.push(ex.name);
           ex.name = name;
           ex.issues = 1;
-          toast('Updated ' + num + ' \u2192 ' + name);
+          toast('Updated ' + num + ' > ' + name);
         }
       } else {
         elems.push({ id:'e'+num, num:num, name:name, variants:[], oldNames:[], figures:[], source:'drag', status:'auto', refs:0, issues:0 });
@@ -405,7 +436,7 @@ function addFromSelection() {
 }
 
 // ============================================================
-// QUICK INSERT — $ autocomplete in Task Pane
+// QUICK INSERT
 // ============================================================
 function onQiInput() {
   var inp = document.getElementById('qiInput');
@@ -413,50 +444,52 @@ function onQiInput() {
   var dd = document.getElementById('qiDropdown');
   var btn = document.getElementById('qiBtn');
 
-  // Must start with $
-  if (!val.startsWith('$')) { dd.classList.remove('show'); btn.disabled = true; qiMatches = []; return; }
+  if (val.charAt(0) !== '$') { dd.className = 'qi-dropdown'; btn.disabled = true; qiMatches = []; return; }
 
   var q = val.substring(1).toLowerCase();
-  if (!q) { dd.classList.remove('show'); btn.disabled = true; qiMatches = []; return; }
+  if (!q) { dd.className = 'qi-dropdown'; btn.disabled = true; qiMatches = []; return; }
 
-  // Match by number or name
   qiMatches = elems.filter(function(e) {
     return e.num.indexOf(q) === 0 || e.name.indexOf(q) >= 0;
   }).slice(0, 8);
 
-  if (qiMatches.length === 0) { dd.classList.remove('show'); btn.disabled = true; return; }
+  if (qiMatches.length === 0) { dd.className = 'qi-dropdown'; btn.disabled = true; return; }
 
   qiSelected = 0;
   renderQiDropdown();
-  dd.classList.add('show');
+  dd.className = 'qi-dropdown show';
   btn.disabled = false;
 }
 
 function renderQiDropdown() {
   var dd = document.getElementById('qiDropdown');
-  dd.innerHTML = qiMatches.map(function(e, i) {
-    return '<div class="qi-item' + (i === qiSelected ? ' selected' : '') + '" onclick="qiPick(' + i + ')" onmouseenter="qiSelected=' + i + ';renderQiDropdown()">' +
+  var html = '';
+  for (var i = 0; i < qiMatches.length; i++) {
+    var e = qiMatches[i];
+    html += '<div class="qi-item' + (i === qiSelected ? ' selected' : '') + '" onclick="qiPick(' + i + ')">' +
       '<span class="qi-num">' + e.num + '</span><span class="qi-name">' + e.name + '</span></div>';
-  }).join('');
+  }
+  dd.innerHTML = html;
 }
 
 function onQiKey(ev) {
   var dd = document.getElementById('qiDropdown');
-  if (!dd.classList.contains('show') || qiMatches.length === 0) return;
+  var code = ev.keyCode || ev.which;
+  if (dd.className.indexOf('show') < 0 || qiMatches.length === 0) return;
 
-  if (ev.key === 'ArrowDown') {
+  if (code === 40) { // ArrowDown
     ev.preventDefault();
     qiSelected = Math.min(qiSelected + 1, qiMatches.length - 1);
     renderQiDropdown();
-  } else if (ev.key === 'ArrowUp') {
+  } else if (code === 38) { // ArrowUp
     ev.preventDefault();
     qiSelected = Math.max(qiSelected - 1, 0);
     renderQiDropdown();
-  } else if (ev.key === 'Enter') {
+  } else if (code === 13) { // Enter
     ev.preventDefault();
     qiPick(qiSelected);
-  } else if (ev.key === 'Escape') {
-    dd.classList.remove('show');
+  } else if (code === 27) { // Escape
+    dd.className = 'qi-dropdown';
   }
 }
 
@@ -464,15 +497,14 @@ function qiPick(idx) {
   if (idx < 0 || idx >= qiMatches.length) return;
   var e = qiMatches[idx];
   document.getElementById('qiInput').value = e.name + ' ' + e.num;
-  document.getElementById('qiDropdown').classList.remove('show');
+  document.getElementById('qiDropdown').className = 'qi-dropdown';
   document.getElementById('qiBtn').disabled = false;
 }
 
 function qiInsert() {
   var inp = document.getElementById('qiInput');
   var text = inp.value.trim();
-  if (!text || text.startsWith('$')) {
-    // If still in $ mode, pick first match
+  if (!text || text.charAt(0) === '$') {
     if (qiMatches.length > 0) {
       var e = qiMatches[qiSelected >= 0 ? qiSelected : 0];
       text = e.name + ' ' + e.num;
@@ -487,14 +519,14 @@ function qiInsert() {
     return ctx.sync().then(function() {
       toast('Inserted: ' + text);
       inp.value = '';
-      document.getElementById('qiDropdown').classList.remove('show');
+      document.getElementById('qiDropdown').className = 'qi-dropdown';
       document.getElementById('qiBtn').disabled = true;
     });
   }).catch(function(e) { toast('Insert error: ' + e.message); });
 }
 
 // ============================================================
-// INSPECTION — Search document + highlight
+// INSPECTION
 // ============================================================
 function runInspection() {
   if (!officeReady) { toast('Not connected to Word'); return; }
@@ -510,20 +542,17 @@ function runInspection() {
       el.refs = 0;
       el.issues = 0;
 
-      // Search official name + number
       var officialPattern = el.name + ' ' + el.num;
       var results = body.search(officialPattern, { matchCase: false, matchWholeWord: false });
       results.load('items');
       promises.push({ elem: el, type: 'official', results: results });
 
-      // Search variants
       el.variants.forEach(function(v) {
         var vResults = body.search(v + ' ' + el.num, { matchCase: false, matchWholeWord: false });
         vResults.load('items');
         promises.push({ elem: el, type: 'variant', results: vResults, variant: v });
       });
 
-      // Search old names
       el.oldNames.forEach(function(old) {
         var oResults = body.search(old + ' ' + el.num, { matchCase: false, matchWholeWord: false });
         oResults.load('items');
@@ -549,20 +578,19 @@ function runInspection() {
             p.results.items.forEach(function(r) { r.font.highlightColor = 'Pink'; });
             issues.push({
               type: 'old', num: p.elem.num,
-              desc: '\u201c' + p.oldName + '\u201d should be \u201c' + p.elem.name + '\u201d',
+              desc: '"' + p.oldName + '" should be "' + p.elem.name + '"',
               count: count
             });
           }
         }
       });
 
-      // Check orphans
       elems.forEach(function(el) {
         if (el.refs === 0) {
           el.issues++;
           issues.push({
             type: 'orphan', num: el.num,
-            desc: '\u201c' + el.name + '\u201d not found in document',
+            desc: '"' + el.name + '" not found in document',
             count: 0
           });
         }
@@ -580,11 +608,12 @@ function runInspection() {
 
 function showInspectionResults(issues, matches) {
   var sum = document.getElementById('inspSummary');
-  sum.style.display = 'grid';
+  sum.style.display = '-ms-flexbox';
+  sum.style.display = 'flex';
   sum.innerHTML =
-    '<div class="istat"><div class="n" style="color:var(--tx)">' + elems.length + '</div><div class="l">Elements</div></div>' +
-    '<div class="istat"><div class="n" style="color:var(--green)">' + matches + '</div><div class="l">Matches</div></div>' +
-    '<div class="istat"><div class="n" style="color:' + (issues.length > 0 ? 'var(--red)' : 'var(--green)') + '">' + issues.length + '</div><div class="l">Issues</div></div>';
+    '<div class="istat"><div class="n" style="color:#1a1d23">' + elems.length + '</div><div class="l">Elements</div></div>' +
+    '<div class="istat"><div class="n" style="color:#16a34a">' + matches + '</div><div class="l">Matches</div></div>' +
+    '<div class="istat"><div class="n" style="color:' + (issues.length > 0 ? '#dc2626' : '#16a34a') + '">' + issues.length + '</div><div class="l">Issues</div></div>';
 
   var badge = document.getElementById('inspBadge');
   if (issues.length > 0) { badge.textContent = issues.length; badge.style.display = 'inline-block'; }
@@ -592,19 +621,22 @@ function showInspectionResults(issues, matches) {
 
   var list = document.getElementById('issueList');
   if (issues.length === 0) {
-    list.innerHTML = '<div style="padding:30px;text-align:center"><div style="font-size:20px;margin-bottom:6px">\u2713</div><div style="color:var(--green);font-weight:600;font-size:12px">All clean!</div><div style="color:var(--tx3);font-size:9px;margin-top:2px">No issues found</div></div>';
+    list.innerHTML = '<div style="padding:30px;text-align:center"><div style="font-size:20px;margin-bottom:6px;color:#16a34a">OK</div><div style="color:#16a34a;font-weight:600;font-size:12px">All clean!</div><div style="color:#9099a6;font-size:9px;margin-top:2px">No issues found</div></div>';
     return;
   }
-  list.innerHTML = issues.map(function(iss) {
+  var html = '';
+  for (var i = 0; i < issues.length; i++) {
+    var iss = issues[i];
     var cls = iss.type === 'old' ? 'old' : iss.type === 'mismatch' ? 'mis' : 'orp';
     var label = iss.type === 'old' ? 'OLD NAME' : iss.type === 'mismatch' ? 'MISMATCH' : 'UNREFERENCED';
-    var icon = iss.type === 'old' ? '\u21bb' : iss.type === 'mismatch' ? '!' : '?';
-    return '<div class="issue-item" onclick="scrollToElement(\'' + iss.num + '\')">' +
+    var icon = iss.type === 'old' ? 'O' : iss.type === 'mismatch' ? '!' : '?';
+    html += '<div class="issue-item" onclick="scrollToElement(\'' + iss.num + '\')">' +
       '<div class="issue-icon ' + cls + '">' + icon + '</div>' +
-      '<div class="issue-body"><div class="it ' + cls + '">' + label + (iss.count ? ' \u00d7' + iss.count : '') + '</div>' +
-      '<div class="id"><strong>#' + iss.num + '</strong> \u2014 ' + iss.desc + '</div></div>' +
+      '<div class="issue-body"><div class="it ' + cls + '">' + label + (iss.count ? ' x' + iss.count : '') + '</div>' +
+      '<div class="id"><strong>#' + iss.num + '</strong> - ' + iss.desc + '</div></div>' +
       '<div class="issue-go" onclick="event.stopPropagation();scrollToElement(\'' + iss.num + '\')">Go</div></div>';
-  }).join('');
+  }
+  list.innerHTML = html;
 }
 
 // ============================================================
@@ -618,7 +650,6 @@ function clearHighlights() {
     var allSearches = [];
 
     elems.forEach(function(el) {
-      // Collect all patterns for this element
       var patterns = [el.name + ' ' + el.num];
       el.variants.forEach(function(v) { patterns.push(v + ' ' + el.num); });
       el.oldNames.forEach(function(o) { patterns.push(o + ' ' + el.num); });
@@ -644,7 +675,7 @@ function clearHighlights() {
 }
 
 // ============================================================
-// SCROLL TO ELEMENT in document
+// SCROLL TO ELEMENT
 // ============================================================
 function scrollToElement(num) {
   if (!officeReady) return;
@@ -652,7 +683,6 @@ function scrollToElement(num) {
   if (!el) return;
 
   Word.run(function(ctx) {
-    // Try official name first, then variants
     var results = ctx.document.body.search(el.name + ' ' + num, { matchCase: false });
     results.load('items');
     return ctx.sync().then(function() {
@@ -660,7 +690,6 @@ function scrollToElement(num) {
         results.items[0].select();
         return ctx.sync();
       }
-      // If not found by official name, try variants
       if (el.variants.length > 0) {
         var vResults = ctx.document.body.search(el.variants[0] + ' ' + num, { matchCase: false });
         vResults.load('items');
@@ -682,16 +711,13 @@ function addFigure() {
   var inp = document.getElementById('figAddInput');
   var name = inp.value.trim();
   if (!name) return;
-  // Normalize
   if (/^\d+$/.test(name)) name = 'FIG. ' + name;
   if (figures.find(function(f) { return f.name.toLowerCase() === name.toLowerCase(); })) {
-    toast('Figure already exists');
-    return;
+    toast('Figure already exists'); return;
   }
   figures.push({ name: name, elements: [] });
   inp.value = '';
-  saveFigures();
-  renderFigures();
+  saveFigures(); renderFigures();
   toast('Added: ' + name);
 }
 
@@ -700,24 +726,19 @@ function assignToFigure(figName, elemNum) {
   if (!fig) return;
   if (fig.elements.indexOf(elemNum) >= 0) return;
   fig.elements.push(elemNum);
-  // Also update element's figures array
   var el = elems.find(function(e) { return e.num === elemNum; });
   if (el) {
     if (!el.figures) el.figures = [];
     if (el.figures.indexOf(figName) < 0) el.figures.push(figName);
     save();
   }
-  saveFigures();
-  renderFigures();
+  saveFigures(); renderFigures();
 }
 
 function removeFigure(idx) {
-  var fig = figures[idx];
-  if (!fig) return;
-  if (!confirm('Remove ' + fig.name + '?')) return;
+  if (!confirm('Remove ' + figures[idx].name + '?')) return;
   figures.splice(idx, 1);
-  saveFigures();
-  renderFigures();
+  saveFigures(); renderFigures();
   toast('Removed figure');
 }
 
@@ -729,33 +750,37 @@ function toggleFigure(name) {
 function renderFigures() {
   var list = document.getElementById('figList');
   if (figures.length === 0) {
-    list.innerHTML = '<div class="fig-empty"><div class="empty-icon">\ud83d\uddbc</div>No figures yet.<br>Add FIG. numbers above to map elements to drawings.</div>';
+    list.innerHTML = '<div class="fig-empty">No figures yet.<br>Add FIG. numbers above to map elements to drawings.</div>';
     return;
   }
-  list.innerHTML = figures.map(function(fig, idx) {
+  var html = '';
+  for (var fi = 0; fi < figures.length; fi++) {
+    var fig = figures[fi];
     var isActive = activeFigure === fig.name;
-    var h = '<div class="fig-row' + (isActive ? ' active' : '') + '" onclick="toggleFigure(\'' + fig.name.replace(/'/g, "\\'") + '\')">';
-    h += '<div style="display:flex;align-items:center;justify-content:space-between">';
-    h += '<div class="fig-name">' + fig.name + '</div>';
-    h += '<div style="display:flex;align-items:center;gap:6px"><span style="font-size:8px;color:var(--tx3)">' + fig.elements.length + ' elements</span>';
-    h += '<span style="font-size:8px;color:var(--red);cursor:pointer" onclick="event.stopPropagation();removeFigure(' + idx + ')">\u2715</span></div></div>';
-    h += '<div class="fig-count">' + (isActive ? '\u25BC' : '\u25B6') + ' Click to ' + (isActive ? 'collapse' : 'expand') + '</div></div>';
+    var escapedName = fig.name.replace(/'/g, "\\'");
+    html += '<div class="fig-row' + (isActive ? ' active' : '') + '" onclick="toggleFigure(\'' + escapedName + '\')">';
+    html += '<div style="display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;-ms-flex-pack:justify;justify-content:space-between">';
+    html += '<div class="fig-name">' + fig.name + '</div>';
+    html += '<div><span style="font-size:8px;color:#9099a6;margin-right:6px">' + fig.elements.length + ' elements</span>';
+    html += '<span style="font-size:8px;color:#dc2626;cursor:pointer" onclick="event.stopPropagation();removeFigure(' + fi + ')">x</span></div></div>';
+    html += '<div class="fig-count">' + (isActive ? 'v' : '>') + ' Click to ' + (isActive ? 'collapse' : 'expand') + '</div></div>';
 
     if (isActive) {
-      h += '<div class="fig-elems">';
+      html += '<div class="fig-elems">';
       if (fig.elements.length === 0) {
-        h += '<div style="font-size:9px;color:var(--tx3);padding:4px 0">No elements assigned. Use element detail to assign.</div>';
+        html += '<div style="font-size:9px;color:#9099a6;padding:4px 0">No elements assigned. Use element detail to assign.</div>';
       } else {
-        fig.elements.forEach(function(num) {
+        for (var ei = 0; ei < fig.elements.length; ei++) {
+          var num = fig.elements[ei];
           var el = elems.find(function(e) { return e.num === num; });
-          var name = el ? el.name : '(unknown)';
-          h += '<div class="fig-elem" onclick="scrollToElement(\'' + num + '\')"><span class="fe-num">' + num + '</span>' + name + '</div>';
-        });
+          var eName = el ? el.name : '(unknown)';
+          html += '<div class="fig-elem" onclick="scrollToElement(\'' + num + '\')"><span class="fe-num">' + num + '</span>' + eName + '</div>';
+        }
       }
-      h += '</div>';
+      html += '</div>';
     }
-    return h;
-  }).join('');
+  }
+  list.innerHTML = html;
 }
 
 function saveFigures() {
@@ -766,22 +791,24 @@ function saveFigures() {
 // TABS
 // ============================================================
 function switchTab(id, btn) {
-  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
-  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
-  document.getElementById('p-' + id).classList.add('active');
-  btn.classList.add('active');
+  qsaEach('.panel', function(p){ p.className = p.className.replace(' active', ''); p.style.display = 'none'; });
+  qsaEach('.tab', function(t){ t.className = t.className.replace(' active', ''); });
+  var panel = document.getElementById('p-' + id);
+  panel.className += ' active';
+  panel.style.display = '-ms-flexbox';
+  panel.style.display = 'flex';
+  btn.className += ' active';
   if (id === 'figures') renderFigures();
 }
 
 // ============================================================
-// RENDER — Element list
+// RENDER
 // ============================================================
 function render() {
   var list = document.getElementById('elemList');
   var s = (document.getElementById('searchInput') || {}).value || '';
   s = s.toLowerCase();
   var f = elems.slice();
-  // Sort by number
   f.sort(function(a, b) { return parseInt(a.num) - parseInt(b.num); });
   if (s) f = f.filter(function(e) { return e.name.indexOf(s) >= 0 || e.num.indexOf(s) >= 0; });
   if (filter === 'issues') f = f.filter(function(e) { return e.issues > 0; });
@@ -789,22 +816,25 @@ function render() {
   else if (filter === 'ok') f = f.filter(function(e) { return e.status === 'confirmed'; });
 
   if (f.length === 0 && elems.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">\ud83d\udccb</div><div class="empty-text">No elements yet.<br>Select text in Word or use the form above to add.</div></div>';
+    list.innerHTML = '<div class="empty-state"><div class="empty-text">No elements yet.<br>Select text in Word or use the form above to add.</div></div>';
   } else if (f.length === 0) {
     list.innerHTML = '<div class="empty-state"><div class="empty-text">No matching elements.</div></div>';
   } else {
-    list.innerHTML = f.map(function(e) {
+    var html = '';
+    for (var i = 0; i < f.length; i++) {
+      var e = f[i];
       var a = selId === e.id, m = e.source === 'manual', b = '';
       if (m) b += '<span class="bsm b-manual">M</span>';
       if (e.issues > 0) b += '<span class="bsm b-issue">!' + e.issues + '</span>';
-      else if (e.status === 'confirmed') b += '<span class="bsm b-ok">\u2713</span>';
-      return '<div class="elem-row' + (a ? ' active' : '') + (m && !a ? ' manual' : '') + '" onclick="sel_elem(\'' + e.id + '\')">' +
+      else if (e.status === 'confirmed') b += '<span class="bsm b-ok">OK</span>';
+      var figText = e.figures && e.figures.length ? ' | ' + e.figures.join(', ') : '';
+      html += '<div class="elem-row' + (a ? ' active' : '') + (m && !a ? ' manual' : '') + '" onclick="sel_elem(\'' + e.id + '\')">' +
         '<div class="e-num">' + e.num + '</div><div class="e-info"><div class="e-name">' + e.name + '</div>' +
-        '<div class="e-meta">' + e.refs + ' refs' + (e.variants.length ? ' \u00b7 ' + e.variants.length + 'v' : '') +
-        (e.figures && e.figures.length ? ' \u00b7 ' + e.figures.join(', ') : '') + '</div></div>' +
+        '<div class="e-meta">' + e.refs + ' refs' + (e.variants.length ? ' | ' + e.variants.length + 'v' : '') + figText + '</div></div>' +
         '<div class="e-badges">' + b + '</div>' +
-        '<div class="e-go" onclick="event.stopPropagation();scrollToElement(\'' + e.num + '\')" title="Go to document">\u279c</div></div>';
-    }).join('');
+        '<div class="e-go" onclick="event.stopPropagation();scrollToElement(\'' + e.num + '\')" title="Go to document">&gt;</div></div>';
+    }
+    list.innerHTML = html;
   }
 
   document.getElementById('fAll').textContent = elems.length;
@@ -816,8 +846,8 @@ function render() {
 
 function setF(f, btn) {
   filter = f;
-  document.querySelectorAll('#filterBar .fbtn').forEach(function(b) { b.classList.remove('active'); });
-  btn.classList.add('active');
+  qsaEach('#filterBar .fbtn', function(b) { b.className = b.className.replace(' active', ''); });
+  btn.className += ' active';
   render();
 }
 
@@ -833,38 +863,41 @@ function sel_elem(id) {
 
   var inner = document.getElementById('detailInner');
   var h = '<div class="dh"><div class="dh-num">#' + e.num + '</div><div class="dh-actions">';
-  h += '<button class="dh-close" onclick="scrollToElement(\'' + e.num + '\')" title="Go to document">\u279c</button>';
-  h += '<button class="dh-close" onclick="deleteElem(\'' + e.id + '\')" title="Delete" style="color:var(--red)">\u2715</button>';
-  h += '<button class="dh-close" onclick="closeDetail()">\u2190</button>';
+  h += '<button class="dh-close" onclick="scrollToElement(\'' + e.num + '\')" title="Go to document">&gt;</button>';
+  h += '<button class="dh-close" onclick="deleteElem(\'' + e.id + '\')" title="Delete" style="color:#dc2626">x</button>';
+  h += '<button class="dh-close" onclick="closeDetail()">&lt;</button>';
   h += '</div></div>';
 
-  // Official Name
-  h += '<div class="fg"><div class="fl">Official Name</div><div style="display:flex;gap:4px"><input class="fi" id="dName" value="' + e.name + '" style="flex:1"><button class="add-btn" style="padding:3px 7px;font-size:8px" onclick="saveName(\'' + e.id + '\')">Save</button></div></div>';
+  h += '<div class="fg"><div class="fl">Official Name</div><div style="display:-ms-flexbox;display:flex"><input class="fi" id="dName" value="' + e.name + '" style="-ms-flex:1;flex:1;margin-right:4px"><button class="add-btn" style="padding:3px 7px;font-size:8px" onclick="saveName(\'' + e.id + '\')">Save</button></div></div>';
 
-  // Variants
   h += '<div class="fg"><div class="fl">Variants</div><input class="fi" id="dVariants" value="' + e.variants.join(', ') + '" placeholder="comma-separated..." onchange="saveVariants(\'' + e.id + '\')"><div class="fh">Accepted forms (auto-saved on change)</div></div>';
 
-  // Old Names
   h += '<div class="fg"><div class="fl">Old Names</div>';
   if (e.oldNames.length) {
-    h += '<div>' + e.oldNames.map(function(n, i) {
-      return '<span class="old-tag">' + n + '<span class="old-x" onclick="removeOldName(\'' + e.id + '\',' + i + ')">\u2715</span></span>';
-    }).join('') + '</div>';
+    h += '<div>';
+    for (var oi = 0; oi < e.oldNames.length; oi++) {
+      h += '<span class="old-tag">' + e.oldNames[oi] + '<span class="old-x" onclick="removeOldName(\'' + e.id + '\',' + oi + ')">x</span></span>';
+    }
+    h += '</div>';
   }
-  h += '<div style="display:flex;gap:4px;margin-top:3px"><input class="fi" id="dOldName" placeholder="Add old name..." style="flex:1" onkeydown="if(event.key===\'Enter\')addOldName(\'' + e.id + '\')"><button class="add-btn" style="padding:3px 7px;font-size:8px" onclick="addOldName(\'' + e.id + '\')">+</button></div>';
+  h += '<div style="display:-ms-flexbox;display:flex;margin-top:3px"><input class="fi" id="dOldName" placeholder="Add old name..." style="-ms-flex:1;flex:1;margin-right:4px" onkeydown="if(event.keyCode===13)addOldName(\'' + e.id + '\')"><button class="add-btn" style="padding:3px 7px;font-size:8px" onclick="addOldName(\'' + e.id + '\')">+</button></div>';
   h += '<div class="fh">Flagged as issues in inspection</div></div>';
 
-  // Figure assignment
   h += '<div class="fg"><div class="fl">Figures</div>';
   if (e.figures.length) {
-    h += '<div class="d-fig">' + e.figures.map(function(f) { return '<span class="d-fig-tag">' + f + '</span>'; }).join('') + '</div>';
+    h += '<div class="d-fig">';
+    for (var fi = 0; fi < e.figures.length; fi++) {
+      h += '<span class="d-fig-tag">' + e.figures[fi] + '</span>';
+    }
+    h += '</div>';
   }
   if (figures.length > 0) {
     h += '<div style="margin-top:3px"><select class="fi" id="dFigSelect" style="padding:3px 5px"><option value="">Assign to figure...</option>';
-    figures.forEach(function(fig) {
-      var assigned = e.figures.indexOf(fig.name) >= 0;
-      if (!assigned) h += '<option value="' + fig.name + '">' + fig.name + '</option>';
-    });
+    for (var fj = 0; fj < figures.length; fj++) {
+      if (e.figures.indexOf(figures[fj].name) < 0) {
+        h += '<option value="' + figures[fj].name + '">' + figures[fj].name + '</option>';
+      }
+    }
     h += '</select></div>';
     h += '<button class="add-btn" style="padding:3px 7px;font-size:8px;margin-top:3px" onclick="assignFromDetail(\'' + e.num + '\')">Assign</button>';
   } else {
@@ -872,17 +905,16 @@ function sel_elem(id) {
   }
   h += '</div>';
 
-  // Confirm
-  h += '<div class="fg"><button class="add-btn" style="width:100%;padding:6px;font-size:9px;' +
-    (e.status === 'confirmed' ? 'background:var(--green)' : 'background:var(--acc)') + '" onclick="confirmElem(\'' + e.id + '\')">' +
-    (e.status === 'confirmed' ? '\u2713 Confirmed' : 'Confirm Element') + '</button></div>';
+  var confirmStyle = e.status === 'confirmed' ? 'background:#16a34a' : 'background:#2563eb';
+  var confirmText = e.status === 'confirmed' ? 'Confirmed' : 'Confirm Element';
+  h += '<div class="fg"><button class="add-btn" style="width:100%;padding:6px;font-size:9px;' + confirmStyle + '" onclick="confirmElem(\'' + e.id + '\')">' + confirmText + '</button></div>';
 
   inner.innerHTML = h;
-  document.getElementById('detailPanel').classList.add('open');
+  document.getElementById('detailPanel').className = 'detail open';
 }
 
 function closeDetail() {
-  document.getElementById('detailPanel').classList.remove('open');
+  document.getElementById('detailPanel').className = 'detail';
   selId = null;
   render();
 }
@@ -895,7 +927,7 @@ function saveName(id) {
   e.oldNames.push(e.name);
   e.name = newName;
   save(); render(); sel_elem(id);
-  toast('Name updated \u2192 ' + newName);
+  toast('Name updated > ' + newName);
 }
 
 function saveVariants(id) {
@@ -978,18 +1010,18 @@ function bulkImport() {
   if (!text) return;
   var lines = text.split('\n');
   var count = 0;
-  lines.forEach(function(line) {
-    line = line.trim();
-    if (!line) return;
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (!line) continue;
     var m = line.match(/^(.+?)\s+(\d{2,4}[A-Za-z]?)$/i) || line.match(/^(\d{2,4}[A-Za-z]?)\s+(.+)$/i);
-    if (!m) return;
+    if (!m) continue;
     var num, name;
     if (/^\d/.test(m[1])) { num = m[1]; name = m[2]; } else { name = m[1]; num = m[2]; }
     name = name.toLowerCase().trim();
-    if (elems.find(function(e) { return e.num === num; })) return;
+    if (elems.find(function(e) { return e.num === num; })) continue;
     elems.push({ id: 'e' + num, num: num, name: name, variants: [], oldNames: [], figures: [], source: 'bulk', status: 'auto', refs: 0, issues: 0 });
     count++;
-  });
+  }
   save(); render();
   toast('Imported ' + count + ' elements');
 }
@@ -1008,7 +1040,7 @@ function exportJSON() {
   var a = document.createElement('a');
   a.href = url; a.download = 'pei-data.json'; a.click();
   URL.revokeObjectURL(url);
-  toast('Exported ' + elems.length + ' elements + ' + figures.length + ' figures');
+  toast('Exported ' + elems.length + ' elements');
 }
 
 function importJSON(ev) {
@@ -1019,11 +1051,9 @@ function importJSON(ev) {
     try {
       var imported = JSON.parse(e.target.result);
       if (Array.isArray(imported)) {
-        // Legacy format (array of elements only)
         elems = imported;
         elems.forEach(function(el) { if (!el.figures) el.figures = []; });
       } else if (imported.elements) {
-        // New format
         elems = imported.elements;
         elems.forEach(function(el) { if (!el.figures) el.figures = []; });
         if (imported.figures) figures = imported.figures;
@@ -1033,7 +1063,7 @@ function importJSON(ev) {
     } catch(err) { toast('Invalid JSON file'); }
   };
   reader.readAsText(file);
-  ev.target.value = ''; // Reset so same file can be imported again
+  ev.target.value = '';
 }
 
 function clearAllData() {
@@ -1051,9 +1081,9 @@ function clearAllData() {
 function toast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg;
-  t.classList.add('show');
+  t.className = 'toast show';
   clearTimeout(t._timer);
-  t._timer = setTimeout(function() { t.classList.remove('show'); }, 2200);
+  t._timer = setTimeout(function() { t.className = 'toast'; }, 2200);
 }
 
 // ============================================================
