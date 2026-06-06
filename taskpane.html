@@ -7,7 +7,18 @@
 <script src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#f7f8fa;--bg2:#fff;--bg3:#f0f2f5;--bg4:#e8ebf0;--brd:#e2e5ea;--brd2:#cdd2da;--tx:#1a1d23;--tx2:#5c6370;--tx3:#9099a6;--acc:#2563eb;--acc2:#1d4ed8;--acc-bg:rgba(37,99,235,.06);--acc-brd:rgba(37,99,235,.15);--green:#16a34a;--green-bg:rgba(22,163,74,.06);--green-brd:rgba(22,163,74,.15);--yellow:#d97706;--red:#dc2626;--red-bg:rgba(220,38,38,.06);--pink:#db2777;--pink-bg:rgba(219,39,119,.06);--pink-brd:rgba(219,39,119,.15);--blue:#2563eb;--radius:6px}
+:root{
+  --bg:#f7f8fa;--bg2:#fff;--bg3:#f0f2f5;--bg4:#e8ebf0;
+  --brd:#e2e5ea;--brd2:#cdd2da;
+  --tx:#1a1d23;--tx2:#5c6370;--tx3:#9099a6;
+  --acc:#2563eb;--acc2:#1d4ed8;--acc-bg:rgba(37,99,235,.06);--acc-brd:rgba(37,99,235,.15);
+  --green:#16a34a;--green-bg:rgba(22,163,74,.06);--green-brd:rgba(22,163,74,.15);
+  --yellow:#d97706;--yellow-bg:rgba(217,119,6,.06);--yellow-brd:rgba(217,119,6,.15);
+  --red:#dc2626;--red-bg:rgba(220,38,38,.06);
+  --pink:#db2777;--pink-bg:rgba(219,39,119,.06);--pink-brd:rgba(219,39,119,.15);
+  --blue:#0891b2;--blue-bg:rgba(8,145,178,.06);--blue-brd:rgba(8,145,178,.15);
+  --radius:6px
+}
 body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:var(--tx);font-size:12px;line-height:1.5;height:100vh;overflow:hidden;display:flex;flex-direction:column}
 
 /* Header */
@@ -33,7 +44,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 /* Add from selection */
 .sel-bar{padding:8px 10px;background:var(--acc-bg);border-bottom:1px solid var(--acc-brd);display:flex;align-items:center;gap:6px}
 .sel-bar .sel-text{flex:1;font-size:10px;color:var(--acc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sel-bar .sel-btn{padding:4px 10px;background:var(--acc);color:#fff;border:none;border-radius:4px;font-size:9px;font-weight:600;cursor:pointer}
+.sel-bar .sel-btn{padding:4px 10px;background:var(--acc);color:#fff;border:none;border-radius:4px;font-size:9px;font-weight:600;cursor:pointer;white-space:nowrap}
 .sel-bar .sel-btn:hover{background:var(--acc2)}
 .sel-bar .sel-btn:disabled{background:var(--bg4);color:var(--tx3);cursor:default}
 
@@ -41,9 +52,9 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 .add-form{padding:8px 10px;background:var(--bg2);border-bottom:1px solid var(--brd);display:flex;gap:5px}
 .add-form input{border:1px solid var(--brd2);border-radius:5px;padding:5px 7px;font-size:10px;background:var(--bg);color:var(--tx);outline:none;font-family:inherit}
 .add-form input:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(37,99,235,.08)}
-.num-input{width:48px;font-family:'Cascadia Code',monospace;text-align:center}
-.name-input{flex:1}
-.add-btn{padding:5px 10px;background:var(--acc);color:#fff;border:none;border-radius:5px;font-size:9px;font-weight:600;cursor:pointer}
+.num-input{width:48px;font-family:'Cascadia Code','Consolas',monospace;text-align:center}
+.name-input{flex:1;min-width:0}
+.add-btn{padding:5px 10px;background:var(--acc);color:#fff;border:none;border-radius:5px;font-size:9px;font-weight:600;cursor:pointer;white-space:nowrap}
 .add-btn:hover{background:var(--acc2)}
 
 /* Search + Filter */
@@ -58,60 +69,133 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 
 /* Element list */
 .elem-list{flex:1;overflow-y:auto;padding:2px 0}
-.elem-row{display:flex;align-items:center;padding:6px 10px;gap:6px;cursor:pointer;border-bottom:1px solid var(--bg3);transition:background .08s}
+.elem-row{display:flex;align-items:center;padding:6px 10px;gap:6px;cursor:pointer;border-bottom:1px solid var(--bg3);transition:background .08s;border-left:3px solid transparent}
 .elem-row:hover{background:var(--bg3)}
-.elem-row.active{background:var(--acc-bg);border-left:3px solid var(--acc)}
-.elem-row.manual{border-left:3px solid var(--green)}
-.e-num{font-family:'Cascadia Code',monospace;font-size:12px;font-weight:700;color:var(--acc);min-width:32px}
+.elem-row.active{background:var(--acc-bg);border-left-color:var(--acc)}
+.elem-row.manual{border-left-color:var(--green)}
+.elem-row.active.manual{border-left-color:var(--acc)}
+.e-num{font-family:'Cascadia Code','Consolas',monospace;font-size:12px;font-weight:700;color:var(--acc);min-width:32px}
 .e-info{flex:1;min-width:0}
 .e-name{font-size:10px;font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .e-meta{font-size:8px;color:var(--tx3)}
-.e-badges{display:flex;gap:2px}
+.e-badges{display:flex;gap:2px;flex-shrink:0}
 .bsm{font-size:7px;padding:1px 4px;border-radius:3px;font-weight:600}
 .b-manual{background:var(--green-bg);color:var(--green);border:1px solid var(--green-brd)}
 .b-issue{background:var(--red-bg);color:var(--red);border:1px solid rgba(220,38,38,.15)}
 .b-ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-brd)}
+.e-go{font-size:9px;color:var(--tx3);cursor:pointer;padding:2px}
+.e-go:hover{color:var(--acc)}
 
 /* Detail */
 .detail{background:var(--bg2);border-top:1px solid var(--brd);max-height:0;overflow:hidden;transition:max-height .25s}
-.detail.open{max-height:380px;overflow-y:auto}
+.detail.open{max-height:420px;overflow-y:auto}
 .detail-inner{padding:10px}
 .dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .dh-num{font-family:monospace;font-size:18px;font-weight:700;color:var(--acc)}
+.dh-actions{display:flex;gap:4px}
 .dh-close{width:22px;height:22px;display:flex;align-items:center;justify-content:center;border:none;background:var(--bg3);border-radius:4px;cursor:pointer;color:var(--tx3);font-size:12px}
+.dh-close:hover{background:var(--bg4);color:var(--tx)}
 .fg{margin-bottom:8px}
 .fl{font-size:8px;text-transform:uppercase;letter-spacing:.7px;color:var(--tx3);font-weight:600;margin-bottom:2px}
 .fi{width:100%;padding:4px 7px;font-size:10px;border:1px solid var(--brd);border-radius:4px;background:var(--bg);color:var(--tx);outline:none;font-family:inherit}
 .fi:focus{border-color:var(--acc)}
 .fh{font-size:8px;color:var(--tx3);margin-top:1px}
 .old-tag{display:inline-flex;align-items:center;gap:2px;padding:2px 6px;border-radius:3px;font-size:8px;font-weight:500;background:var(--pink-bg);color:var(--pink);border:1px solid var(--pink-brd);margin:2px 2px 0 0}
-.hl-row{display:flex;align-items:center;gap:5px;padding:3px 6px;border-radius:3px;cursor:pointer;font-size:9px}
-.hl-row:hover{background:var(--bg3)}
-.hl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.hl-dot.green{background:var(--green)}.hl-dot.yellow{background:var(--yellow)}.hl-dot.pink{background:var(--pink)}.hl-dot.blue{background:var(--blue)}
+.old-tag .old-x{cursor:pointer;opacity:.5;font-size:7px;margin-left:2px}
+.old-tag .old-x:hover{opacity:1}
+.d-fig{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.d-fig-tag{padding:2px 7px;border-radius:3px;font-size:8px;font-weight:500;background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-brd)}
 
 /* Inspection */
-.insp-btn{width:calc(100% - 20px);margin:10px;padding:10px;background:var(--acc);color:#fff;border:none;border-radius:var(--radius);font-size:12px;font-weight:600;cursor:pointer}
-.insp-btn:hover{background:var(--acc2)}
+.insp-actions{padding:10px;display:flex;gap:6px}
+.insp-btn{flex:1;padding:10px;border:none;border-radius:var(--radius);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px}
+.insp-btn.run{background:var(--acc);color:#fff}
+.insp-btn.run:hover{background:var(--acc2)}
+.insp-btn.clear{background:var(--bg3);color:var(--tx2);border:1px solid var(--brd)}
+.insp-btn.clear:hover{background:var(--bg4);color:var(--tx)}
 .insp-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 10px;background:var(--bg2);border-bottom:1px solid var(--brd)}
 .istat{text-align:center;padding:6px;border-radius:var(--radius);background:var(--bg)}
 .istat .n{font-family:monospace;font-size:16px;font-weight:700}.istat .l{font-size:7px;text-transform:uppercase;color:var(--tx3)}
-.issue-item{padding:8px 10px;border-bottom:1px solid var(--bg3);cursor:pointer}
+.issue-item{padding:8px 10px;border-bottom:1px solid var(--bg3);cursor:pointer;display:flex;align-items:flex-start;gap:8px}
 .issue-item:hover{background:var(--bg3)}
+.issue-icon{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;margin-top:1px}
+.issue-icon.old{background:var(--pink-bg);color:var(--pink)}
+.issue-icon.mis{background:var(--red-bg);color:var(--red)}
+.issue-icon.orp{background:var(--yellow-bg);color:var(--yellow)}
+.issue-body{flex:1;min-width:0}
 .it{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
 .it.old{color:var(--pink)}.it.mis{color:var(--red)}.it.orp{color:var(--yellow)}
-.id{font-size:10px;color:var(--tx);margin-top:2px}
+.id{font-size:10px;color:var(--tx);margin-top:1px}
+.id strong{font-family:monospace}
+.issue-go{font-size:8px;color:var(--tx3);padding:2px 5px;border:1px solid var(--brd);border-radius:3px;cursor:pointer;flex-shrink:0;margin-top:2px}
+.issue-go:hover{border-color:var(--acc);color:var(--acc)}
+
+/* Quick Insert */
+.qi-box{padding:8px 10px;background:var(--blue-bg);border-bottom:1px solid var(--blue-brd)}
+.qi-label{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.qi-row{display:flex;gap:4px;position:relative}
+.qi-input{flex:1;padding:5px 8px;font-size:11px;border:1px solid var(--brd2);border-radius:4px;background:var(--bg2);color:var(--tx);outline:none;font-family:'Cascadia Code','Consolas',monospace}
+.qi-input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(8,145,178,.1)}
+.qi-insert-btn{padding:5px 10px;background:var(--blue);color:#fff;border:none;border-radius:4px;font-size:9px;font-weight:600;cursor:pointer;white-space:nowrap}
+.qi-insert-btn:hover{background:#0e7490}
+.qi-insert-btn:disabled{background:var(--bg4);color:var(--tx3);cursor:default}
+.qi-dropdown{position:absolute;top:100%;left:0;right:50px;background:var(--bg2);border:1px solid var(--brd2);border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:50;max-height:160px;overflow-y:auto;display:none;margin-top:2px}
+.qi-dropdown.show{display:block}
+.qi-item{padding:5px 8px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:10px;border-bottom:1px solid var(--bg3)}
+.qi-item:last-child{border-bottom:none}
+.qi-item:hover,.qi-item.selected{background:var(--blue-bg)}
+.qi-item .qi-num{font-family:monospace;font-weight:700;color:var(--blue);min-width:28px}
+.qi-item .qi-name{color:var(--tx);flex:1}
+
+/* Figures */
+.fig-header{padding:10px;border-bottom:1px solid var(--brd)}
+.fig-add{display:flex;gap:4px}
+.fig-add input{flex:1;padding:5px 7px;font-size:10px;border:1px solid var(--brd2);border-radius:4px;background:var(--bg);color:var(--tx);outline:none;font-family:inherit}
+.fig-add input:focus{border-color:var(--acc)}
+.fig-list{flex:1;overflow-y:auto}
+.fig-row{padding:8px 10px;border-bottom:1px solid var(--bg3);cursor:pointer}
+.fig-row:hover{background:var(--bg3)}
+.fig-row.active{background:var(--acc-bg);border-left:3px solid var(--acc)}
+.fig-name{font-size:11px;font-weight:600;color:var(--tx)}
+.fig-count{font-size:8px;color:var(--tx3);margin-top:1px}
+.fig-elems{padding:4px 10px 8px 20px}
+.fig-elem{display:flex;align-items:center;gap:5px;padding:3px 0;font-size:9px;color:var(--tx2);cursor:pointer}
+.fig-elem:hover{color:var(--acc)}
+.fig-elem .fe-num{font-family:monospace;font-weight:700;color:var(--acc);min-width:24px}
+.fig-empty{padding:20px;text-align:center;color:var(--tx3);font-size:10px}
+
+/* Config */
+.cfg-section{padding:12px}
+.cfg-title{font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.cfg-row{display:flex;gap:6px;margin-bottom:8px}
+.cfg-btn{flex:1;padding:8px;border-radius:var(--radius);font-size:10px;font-weight:500;cursor:pointer;text-align:center;border:1px solid var(--brd);background:var(--bg2);color:var(--tx)}
+.cfg-btn:hover{border-color:var(--acc);color:var(--acc)}
+.cfg-btn.primary{background:var(--acc);color:#fff;border-color:var(--acc)}
+.cfg-btn.primary:hover{background:var(--acc2)}
+.cfg-btn.danger{color:var(--red);border-color:rgba(220,38,38,.2)}
+.cfg-btn.danger:hover{background:var(--red-bg);border-color:var(--red)}
+.cfg-hl{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bg3);font-size:10px}
+.cfg-hl:last-child{border-bottom:none}
+.cfg-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0}
+.cfg-hl-label{flex:1;color:var(--tx2)}
+.cfg-hl-val{font-size:9px;font-family:monospace;color:var(--tx3)}
+.cfg-about{font-size:10px;color:var(--tx2);line-height:1.7;margin-top:4px}
+.cfg-sep{height:1px;background:var(--brd);margin:4px 0 12px}
 
 /* Statusbar */
 .statusbar{padding:5px 10px;background:var(--bg2);border-top:1px solid var(--brd);font-size:8px;color:var(--tx3);display:flex;justify-content:space-between;flex-shrink:0}
 
 /* Toast */
-.toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#1e293b;color:#e2e8f0;padding:6px 16px;border-radius:6px;font-size:10px;font-weight:500;z-index:100;display:none}
-.toast.show{display:block;animation:fadeIn .2s}
-@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#1e293b;color:#e2e8f0;padding:6px 16px;border-radius:6px;font-size:10px;font-weight:500;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
 
 /* Scrollbar */
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--brd2);border-radius:2px}
+
+/* Empty state */
+.empty-state{padding:30px 20px;text-align:center;color:var(--tx3)}
+.empty-state .empty-icon{font-size:24px;margin-bottom:6px;opacity:.4}
+.empty-state .empty-text{font-size:10px;line-height:1.6}
 </style>
 </head>
 <body>
@@ -119,13 +203,14 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.1</div>
+  <div class="ver">v0.2</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
 <div class="tabs">
   <button class="tab active" onclick="switchTab('elements',this)">Elements</button>
   <button class="tab" onclick="switchTab('inspect',this)">Inspect<span class="badge" id="inspBadge" style="display:none"></span></button>
+  <button class="tab" onclick="switchTab('figures',this)">Figures</button>
   <button class="tab" onclick="switchTab('config',this)">Config</button>
 </div>
 
@@ -137,11 +222,22 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
     <button class="sel-btn" id="selBtn" onclick="addFromSelection()" disabled>+ Add Selected</button>
   </div>
   <div class="add-form">
-    <input class="num-input" placeholder="#" id="addNum" maxlength="5">
-    <input class="name-input" placeholder="Element name..." id="addName">
+    <input class="num-input" placeholder="#" id="addNum" maxlength="5" onkeydown="if(event.key==='Enter')addManual()">
+    <input class="name-input" placeholder="Element name..." id="addName" onkeydown="if(event.key==='Enter')addManual()">
     <button class="add-btn" onclick="addManual()">Add</button>
   </div>
-  <div class="search-bar"><input placeholder="Search..." id="searchInput" oninput="render()"></div>
+
+  <!-- Quick Insert -->
+  <div class="qi-box">
+    <div class="qi-label">&#9889; Quick Insert <span style="font-weight:400;opacity:.7">type $ + number</span></div>
+    <div class="qi-row">
+      <input class="qi-input" id="qiInput" placeholder="$50 → device 50" oninput="onQiInput()" onkeydown="onQiKey(event)">
+      <button class="qi-insert-btn" id="qiBtn" onclick="qiInsert()" disabled>Insert</button>
+      <div class="qi-dropdown" id="qiDropdown"></div>
+    </div>
+  </div>
+
+  <div class="search-bar"><input placeholder="Search elements..." id="searchInput" oninput="render()"></div>
   <div class="filter-bar" id="filterBar">
     <button class="fbtn active" onclick="setF('all',this)">All <span class="cnt" id="fAll">0</span></button>
     <button class="fbtn" onclick="setF('issues',this)">Issues <span class="cnt" id="fIssues">0</span></button>
@@ -154,22 +250,54 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 
 <!-- INSPECT -->
 <div class="panel" id="p-inspect">
-  <button class="insp-btn" onclick="runInspection()">&#9654; Run Inspection</button>
+  <div class="insp-actions">
+    <button class="insp-btn run" onclick="runInspection()">&#9654; Run Inspection</button>
+    <button class="insp-btn clear" onclick="clearHighlights()">&#10005; Clear</button>
+  </div>
   <div class="insp-summary" id="inspSummary" style="display:none"></div>
   <div id="issueList"></div>
 </div>
 
+<!-- FIGURES -->
+<div class="panel" id="p-figures">
+  <div class="fig-header">
+    <div class="fig-add">
+      <input placeholder="FIG. 1" id="figAddInput" onkeydown="if(event.key==='Enter')addFigure()">
+      <button class="add-btn" onclick="addFigure()">+ Add</button>
+    </div>
+  </div>
+  <div class="fig-list" id="figList"></div>
+</div>
+
 <!-- CONFIG -->
 <div class="panel" id="p-config">
-  <div style="padding:12px">
-    <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px">Data</div>
-    <div style="display:flex;gap:6px">
-      <button class="add-btn" style="flex:1;padding:8px" onclick="exportJSON()">Export JSON</button>
-      <button class="add-btn" style="flex:1;padding:8px;background:var(--bg3);color:var(--tx);border:1px solid var(--brd)" onclick="document.getElementById('importFile').click()">Import JSON</button>
+  <div class="cfg-section">
+    <div class="cfg-title">&#128193; Data</div>
+    <div class="cfg-row">
+      <button class="cfg-btn primary" onclick="exportJSON()">Export JSON</button>
+      <button class="cfg-btn" onclick="document.getElementById('importFile').click()">Import JSON</button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
     </div>
-    <div style="margin-top:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px">About</div>
-    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.1<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
+    <div class="cfg-row">
+      <button class="cfg-btn" onclick="bulkImport()">Bulk Import</button>
+      <button class="cfg-btn danger" onclick="clearAllData()">Clear All</button>
+    </div>
+
+    <div class="cfg-sep"></div>
+    <div class="cfg-title">&#127912; Highlight Colors</div>
+    <div class="cfg-hl"><div class="cfg-dot" style="background:#00ff00"></div><div class="cfg-hl-label">Official match</div><div class="cfg-hl-val">BrightGreen</div></div>
+    <div class="cfg-hl"><div class="cfg-dot" style="background:#ffff00"></div><div class="cfg-hl-label">Variant match</div><div class="cfg-hl-val">Yellow</div></div>
+    <div class="cfg-hl"><div class="cfg-dot" style="background:#ff69b4"></div><div class="cfg-hl-label">Old name (issue)</div><div class="cfg-hl-val">Pink</div></div>
+    <div class="cfg-hl"><div class="cfg-dot" style="background:#40e0d0"></div><div class="cfg-hl-label">Unregistered</div><div class="cfg-hl-val">Turquoise</div></div>
+
+    <div class="cfg-sep"></div>
+    <div class="cfg-title">&#9432; About</div>
+    <div class="cfg-about">
+      Patent Element Inspector v0.2<br>
+      Office Add-in for Word<br>
+      Register, manage, and inspect patent elements.<br>
+      <span style="color:var(--tx3)">github.com/jinny8113/pei</span>
+    </div>
   </div>
 </div>
 
@@ -185,13 +313,19 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 // STATE
 // ============================================================
 var elems = [];
+var figures = [];
 var selId = null, filter = 'all';
 var officeReady = false;
+var qiSelected = -1;
+var qiMatches = [];
+var activeFigure = null;
 
 // Load from localStorage
 try {
   var saved = localStorage.getItem('pei_elements');
   if (saved) elems = JSON.parse(saved);
+  var savedFig = localStorage.getItem('pei_figures');
+  if (savedFig) figures = JSON.parse(savedFig);
 } catch(e){}
 
 // ============================================================
@@ -202,12 +336,9 @@ Office.onReady(function(info) {
   document.getElementById('statusDot').className = 'status-dot ok';
   document.getElementById('statusLabel').textContent = 'Connected to ' + (info.host || 'Word');
   render();
-
-  // Poll for selection changes (Office.js doesn't have a selection change event for all cases)
   setInterval(checkSelection, 1500);
 });
 
-// Fallback if Office.js not available (testing outside Word)
 setTimeout(function(){
   if (!officeReady) {
     document.getElementById('statusDot').className = 'status-dot err';
@@ -229,7 +360,7 @@ function checkSelection() {
       var btn = document.getElementById('selBtn');
       var label = document.getElementById('selText');
       if (text && text.length > 2) {
-        label.textContent = '"' + text + '"';
+        label.textContent = '\u201c' + (text.length > 40 ? text.substring(0, 40) + '...' : text) + '\u201d';
         label.style.fontWeight = '600';
         btn.disabled = false;
       } else {
@@ -249,8 +380,9 @@ function addFromSelection() {
     return ctx.sync().then(function() {
       var text = (sel.text || '').trim();
       if (!text) return;
-      var m = text.match(/^(.+?)\s+(\d{2,4}[A-Z]?)$/i) || text.match(/^(\d{2,4}[A-Z]?)\s+(.+)$/i);
-      if (!m) { toast('Cannot parse: "' + text + '"'); return; }
+      // Try "name number" or "number name" patterns
+      var m = text.match(/^(.+?)\s+(\d{2,4}[A-Za-z]?)$/i) || text.match(/^(\d{2,4}[A-Za-z]?)\s+(.+)$/i);
+      if (!m) { toast('Cannot parse: \u201c' + text + '\u201d'); return; }
       var num, name;
       if (/^\d/.test(m[1])) { num = m[1]; name = m[2]; } else { name = m[1]; num = m[2]; }
       name = name.toLowerCase().trim();
@@ -261,15 +393,104 @@ function addFromSelection() {
           ex.oldNames.push(ex.name);
           ex.name = name;
           ex.issues = 1;
-          toast('Updated ' + num + ' → ' + name);
+          toast('Updated ' + num + ' \u2192 ' + name);
         }
       } else {
-        elems.push({ id:'e'+num, num:num, name:name, variants:[], oldNames:[], source:'drag', status:'auto', refs:0, issues:0 });
+        elems.push({ id:'e'+num, num:num, name:name, variants:[], oldNames:[], figures:[], source:'drag', status:'auto', refs:0, issues:0 });
         toast('Registered: ' + name + ' ' + num);
       }
       save(); render(); sel_elem('e'+num);
     });
   }).catch(function(e){ toast('Error: ' + e.message); });
+}
+
+// ============================================================
+// QUICK INSERT — $ autocomplete in Task Pane
+// ============================================================
+function onQiInput() {
+  var inp = document.getElementById('qiInput');
+  var val = inp.value.trim();
+  var dd = document.getElementById('qiDropdown');
+  var btn = document.getElementById('qiBtn');
+
+  // Must start with $
+  if (!val.startsWith('$')) { dd.classList.remove('show'); btn.disabled = true; qiMatches = []; return; }
+
+  var q = val.substring(1).toLowerCase();
+  if (!q) { dd.classList.remove('show'); btn.disabled = true; qiMatches = []; return; }
+
+  // Match by number or name
+  qiMatches = elems.filter(function(e) {
+    return e.num.indexOf(q) === 0 || e.name.indexOf(q) >= 0;
+  }).slice(0, 8);
+
+  if (qiMatches.length === 0) { dd.classList.remove('show'); btn.disabled = true; return; }
+
+  qiSelected = 0;
+  renderQiDropdown();
+  dd.classList.add('show');
+  btn.disabled = false;
+}
+
+function renderQiDropdown() {
+  var dd = document.getElementById('qiDropdown');
+  dd.innerHTML = qiMatches.map(function(e, i) {
+    return '<div class="qi-item' + (i === qiSelected ? ' selected' : '') + '" onclick="qiPick(' + i + ')" onmouseenter="qiSelected=' + i + ';renderQiDropdown()">' +
+      '<span class="qi-num">' + e.num + '</span><span class="qi-name">' + e.name + '</span></div>';
+  }).join('');
+}
+
+function onQiKey(ev) {
+  var dd = document.getElementById('qiDropdown');
+  if (!dd.classList.contains('show') || qiMatches.length === 0) return;
+
+  if (ev.key === 'ArrowDown') {
+    ev.preventDefault();
+    qiSelected = Math.min(qiSelected + 1, qiMatches.length - 1);
+    renderQiDropdown();
+  } else if (ev.key === 'ArrowUp') {
+    ev.preventDefault();
+    qiSelected = Math.max(qiSelected - 1, 0);
+    renderQiDropdown();
+  } else if (ev.key === 'Enter') {
+    ev.preventDefault();
+    qiPick(qiSelected);
+  } else if (ev.key === 'Escape') {
+    dd.classList.remove('show');
+  }
+}
+
+function qiPick(idx) {
+  if (idx < 0 || idx >= qiMatches.length) return;
+  var e = qiMatches[idx];
+  document.getElementById('qiInput').value = e.name + ' ' + e.num;
+  document.getElementById('qiDropdown').classList.remove('show');
+  document.getElementById('qiBtn').disabled = false;
+}
+
+function qiInsert() {
+  var inp = document.getElementById('qiInput');
+  var text = inp.value.trim();
+  if (!text || text.startsWith('$')) {
+    // If still in $ mode, pick first match
+    if (qiMatches.length > 0) {
+      var e = qiMatches[qiSelected >= 0 ? qiSelected : 0];
+      text = e.name + ' ' + e.num;
+    } else return;
+  }
+
+  if (!officeReady) { toast('Not connected to Word'); return; }
+
+  Word.run(function(ctx) {
+    var sel = ctx.document.getSelection();
+    sel.insertText(text, 'Replace');
+    return ctx.sync().then(function() {
+      toast('Inserted: ' + text);
+      inp.value = '';
+      document.getElementById('qiDropdown').classList.remove('show');
+      document.getElementById('qiBtn').disabled = true;
+    });
+  }).catch(function(e) { toast('Insert error: ' + e.message); });
 }
 
 // ============================================================
@@ -283,90 +504,76 @@ function runInspection() {
 
   Word.run(function(ctx) {
     var body = ctx.document.body;
-    body.load('text');
-    return ctx.sync().then(function() {
-      var docText = body.text;
+    var promises = [];
 
-      // For each registered element, search document
-      var promises = [];
-      elems.forEach(function(el) {
-        el.refs = 0;
-        el.issues = 0;
+    elems.forEach(function(el) {
+      el.refs = 0;
+      el.issues = 0;
 
-        // Search official name + number
-        var officialPattern = el.name + ' ' + el.num;
-        var results = body.search(officialPattern, { matchCase: false, matchWholeWord: false });
-        results.load('items');
-        promises.push({ elem: el, type: 'official', results: results });
+      // Search official name + number
+      var officialPattern = el.name + ' ' + el.num;
+      var results = body.search(officialPattern, { matchCase: false, matchWholeWord: false });
+      results.load('items');
+      promises.push({ elem: el, type: 'official', results: results });
 
-        // Search variants
-        el.variants.forEach(function(v) {
-          var vPattern = v + ' ' + el.num;
-          var vResults = body.search(vPattern, { matchCase: false, matchWholeWord: false });
-          vResults.load('items');
-          promises.push({ elem: el, type: 'variant', results: vResults, variant: v });
-        });
-
-        // Search old names
-        el.oldNames.forEach(function(old) {
-          var oPattern = old + ' ' + el.num;
-          var oResults = body.search(oPattern, { matchCase: false, matchWholeWord: false });
-          oResults.load('items');
-          promises.push({ elem: el, type: 'oldname', results: oResults, oldName: old });
-        });
+      // Search variants
+      el.variants.forEach(function(v) {
+        var vResults = body.search(v + ' ' + el.num, { matchCase: false, matchWholeWord: false });
+        vResults.load('items');
+        promises.push({ elem: el, type: 'variant', results: vResults, variant: v });
       });
 
-      return ctx.sync().then(function() {
-        // Process results — apply highlights
-        promises.forEach(function(p) {
-          var count = p.results.items.length;
-          if (p.type === 'official') {
-            p.elem.refs += count;
-            totalMatches += count;
-            // Green highlight
-            p.results.items.forEach(function(r) { r.font.highlightColor = 'Green'; });
-          } else if (p.type === 'variant') {
-            p.elem.refs += count;
-            totalMatches += count;
-            // Yellow highlight
-            p.results.items.forEach(function(r) { r.font.highlightColor = 'Yellow'; });
-          } else if (p.type === 'oldname') {
-            totalMatches += count;
-            if (count > 0) {
-              p.elem.issues++;
-              // Pink highlight
-              p.results.items.forEach(function(r) { r.font.highlightColor = 'Pink'; });
-              issues.push({
-                type: 'old',
-                num: p.elem.num,
-                desc: '"' + p.oldName + '" should be "' + p.elem.name + '"',
-                count: count
-              });
-            }
-          }
-        });
+      // Search old names
+      el.oldNames.forEach(function(old) {
+        var oResults = body.search(old + ' ' + el.num, { matchCase: false, matchWholeWord: false });
+        oResults.load('items');
+        promises.push({ elem: el, type: 'oldname', results: oResults, oldName: old });
+      });
+    });
 
-        // Check orphans
-        elems.forEach(function(el) {
-          if (el.refs === 0) {
-            el.issues++;
+    return ctx.sync().then(function() {
+      promises.forEach(function(p) {
+        var count = p.results.items.length;
+        if (p.type === 'official') {
+          p.elem.refs += count;
+          totalMatches += count;
+          p.results.items.forEach(function(r) { r.font.highlightColor = 'BrightGreen'; });
+        } else if (p.type === 'variant') {
+          p.elem.refs += count;
+          totalMatches += count;
+          p.results.items.forEach(function(r) { r.font.highlightColor = 'Yellow'; });
+        } else if (p.type === 'oldname') {
+          totalMatches += count;
+          if (count > 0) {
+            p.elem.issues++;
+            p.results.items.forEach(function(r) { r.font.highlightColor = 'Pink'; });
             issues.push({
-              type: 'orphan',
-              num: el.num,
-              desc: '"' + el.name + '" not found in document',
-              count: 0
+              type: 'old', num: p.elem.num,
+              desc: '\u201c' + p.oldName + '\u201d should be \u201c' + p.elem.name + '\u201d',
+              count: count
             });
           }
-        });
-
-        return ctx.sync();
-      }).then(function() {
-        // Show results
-        showInspectionResults(issues, totalMatches);
-        save(); render();
-        toast('Inspection done: ' + issues.length + ' issues');
-        switchTab('inspect', document.querySelectorAll('.tab')[1]);
+        }
       });
+
+      // Check orphans
+      elems.forEach(function(el) {
+        if (el.refs === 0) {
+          el.issues++;
+          issues.push({
+            type: 'orphan', num: el.num,
+            desc: '\u201c' + el.name + '\u201d not found in document',
+            count: 0
+          });
+        }
+      });
+
+      return ctx.sync();
+    }).then(function() {
+      showInspectionResults(issues, totalMatches);
+      save(); render();
+      toast('Inspection: ' + totalMatches + ' matches, ' + issues.length + ' issues');
+      switchTab('inspect', document.querySelectorAll('.tab')[1]);
     });
   }).catch(function(e) { toast('Inspection error: ' + e.message); });
 }
@@ -385,67 +592,174 @@ function showInspectionResults(issues, matches) {
 
   var list = document.getElementById('issueList');
   if (issues.length === 0) {
-    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--green);font-weight:600">All clean!</div>';
+    list.innerHTML = '<div style="padding:30px;text-align:center"><div style="font-size:20px;margin-bottom:6px">\u2713</div><div style="color:var(--green);font-weight:600;font-size:12px">All clean!</div><div style="color:var(--tx3);font-size:9px;margin-top:2px">No issues found</div></div>';
     return;
   }
   list.innerHTML = issues.map(function(iss) {
     var cls = iss.type === 'old' ? 'old' : iss.type === 'mismatch' ? 'mis' : 'orp';
     var label = iss.type === 'old' ? 'OLD NAME' : iss.type === 'mismatch' ? 'MISMATCH' : 'UNREFERENCED';
+    var icon = iss.type === 'old' ? '\u21bb' : iss.type === 'mismatch' ? '!' : '?';
     return '<div class="issue-item" onclick="scrollToElement(\'' + iss.num + '\')">' +
-      '<div class="it ' + cls + '">' + label + '</div>' +
-      '<div class="id"><strong>' + iss.num + '</strong> — ' + iss.desc + '</div></div>';
+      '<div class="issue-icon ' + cls + '">' + icon + '</div>' +
+      '<div class="issue-body"><div class="it ' + cls + '">' + label + (iss.count ? ' \u00d7' + iss.count : '') + '</div>' +
+      '<div class="id"><strong>#' + iss.num + '</strong> \u2014 ' + iss.desc + '</div></div>' +
+      '<div class="issue-go" onclick="event.stopPropagation();scrollToElement(\'' + iss.num + '\')">Go</div></div>';
   }).join('');
 }
 
+// ============================================================
+// CLEAR HIGHLIGHTS
+// ============================================================
 function clearHighlights() {
-  if (!officeReady) return;
+  if (!officeReady) { toast('Not connected to Word'); return; }
+
   Word.run(function(ctx) {
-    // Search for any highlighted text and remove highlighting
     var body = ctx.document.body;
-    ['Green','Yellow','Pink'].forEach(function(color) {
-      // We can't easily search by highlight, so we search known patterns
-      elems.forEach(function(el) {
-        var patterns = [el.name + ' ' + el.num];
-        el.variants.forEach(function(v) { patterns.push(v + ' ' + el.num); });
-        el.oldNames.forEach(function(o) { patterns.push(o + ' ' + el.num); });
-        patterns.forEach(function(p) {
-          var r = body.search(p, { matchCase: false });
-          r.load('items');
-        });
+    var allSearches = [];
+
+    elems.forEach(function(el) {
+      // Collect all patterns for this element
+      var patterns = [el.name + ' ' + el.num];
+      el.variants.forEach(function(v) { patterns.push(v + ' ' + el.num); });
+      el.oldNames.forEach(function(o) { patterns.push(o + ' ' + el.num); });
+
+      patterns.forEach(function(p) {
+        var r = body.search(p, { matchCase: false, matchWholeWord: false });
+        r.load('items');
+        allSearches.push(r);
       });
     });
+
     return ctx.sync().then(function() {
-      // Remove all highlights by setting to NoHighlight
-      elems.forEach(function(el) {
-        var patterns = [el.name + ' ' + el.num];
-        el.variants.forEach(function(v) { patterns.push(v + ' ' + el.num); });
-        el.oldNames.forEach(function(o) { patterns.push(o + ' ' + el.num); });
-        patterns.forEach(function(p) {
-          var r = body.search(p, { matchCase: false });
-          r.load('items');
+      allSearches.forEach(function(r) {
+        r.items.forEach(function(item) {
+          item.font.highlightColor = 'NoHighlight';
         });
       });
       return ctx.sync();
     }).then(function() {
       toast('Highlights cleared');
     });
-  }).catch(function(){});
+  }).catch(function(e) { toast('Clear error: ' + e.message); });
 }
 
+// ============================================================
+// SCROLL TO ELEMENT in document
+// ============================================================
 function scrollToElement(num) {
   if (!officeReady) return;
   var el = elems.find(function(e) { return e.num === num; });
   if (!el) return;
+
   Word.run(function(ctx) {
+    // Try official name first, then variants
     var results = ctx.document.body.search(el.name + ' ' + num, { matchCase: false });
     results.load('items');
     return ctx.sync().then(function() {
       if (results.items.length > 0) {
         results.items[0].select();
+        return ctx.sync();
       }
-      return ctx.sync();
+      // If not found by official name, try variants
+      if (el.variants.length > 0) {
+        var vResults = ctx.document.body.search(el.variants[0] + ' ' + num, { matchCase: false });
+        vResults.load('items');
+        return ctx.sync().then(function() {
+          if (vResults.items.length > 0) {
+            vResults.items[0].select();
+            return ctx.sync();
+          }
+        });
+      }
     });
   }).catch(function(){});
+}
+
+// ============================================================
+// FIGURES
+// ============================================================
+function addFigure() {
+  var inp = document.getElementById('figAddInput');
+  var name = inp.value.trim();
+  if (!name) return;
+  // Normalize
+  if (/^\d+$/.test(name)) name = 'FIG. ' + name;
+  if (figures.find(function(f) { return f.name.toLowerCase() === name.toLowerCase(); })) {
+    toast('Figure already exists');
+    return;
+  }
+  figures.push({ name: name, elements: [] });
+  inp.value = '';
+  saveFigures();
+  renderFigures();
+  toast('Added: ' + name);
+}
+
+function assignToFigure(figName, elemNum) {
+  var fig = figures.find(function(f) { return f.name === figName; });
+  if (!fig) return;
+  if (fig.elements.indexOf(elemNum) >= 0) return;
+  fig.elements.push(elemNum);
+  // Also update element's figures array
+  var el = elems.find(function(e) { return e.num === elemNum; });
+  if (el) {
+    if (!el.figures) el.figures = [];
+    if (el.figures.indexOf(figName) < 0) el.figures.push(figName);
+    save();
+  }
+  saveFigures();
+  renderFigures();
+}
+
+function removeFigure(idx) {
+  var fig = figures[idx];
+  if (!fig) return;
+  if (!confirm('Remove ' + fig.name + '?')) return;
+  figures.splice(idx, 1);
+  saveFigures();
+  renderFigures();
+  toast('Removed figure');
+}
+
+function toggleFigure(name) {
+  activeFigure = activeFigure === name ? null : name;
+  renderFigures();
+}
+
+function renderFigures() {
+  var list = document.getElementById('figList');
+  if (figures.length === 0) {
+    list.innerHTML = '<div class="fig-empty"><div class="empty-icon">\ud83d\uddbc</div>No figures yet.<br>Add FIG. numbers above to map elements to drawings.</div>';
+    return;
+  }
+  list.innerHTML = figures.map(function(fig, idx) {
+    var isActive = activeFigure === fig.name;
+    var h = '<div class="fig-row' + (isActive ? ' active' : '') + '" onclick="toggleFigure(\'' + fig.name.replace(/'/g, "\\'") + '\')">';
+    h += '<div style="display:flex;align-items:center;justify-content:space-between">';
+    h += '<div class="fig-name">' + fig.name + '</div>';
+    h += '<div style="display:flex;align-items:center;gap:6px"><span style="font-size:8px;color:var(--tx3)">' + fig.elements.length + ' elements</span>';
+    h += '<span style="font-size:8px;color:var(--red);cursor:pointer" onclick="event.stopPropagation();removeFigure(' + idx + ')">\u2715</span></div></div>';
+    h += '<div class="fig-count">' + (isActive ? '\u25BC' : '\u25B6') + ' Click to ' + (isActive ? 'collapse' : 'expand') + '</div></div>';
+
+    if (isActive) {
+      h += '<div class="fig-elems">';
+      if (fig.elements.length === 0) {
+        h += '<div style="font-size:9px;color:var(--tx3);padding:4px 0">No elements assigned. Use element detail to assign.</div>';
+      } else {
+        fig.elements.forEach(function(num) {
+          var el = elems.find(function(e) { return e.num === num; });
+          var name = el ? el.name : '(unknown)';
+          h += '<div class="fig-elem" onclick="scrollToElement(\'' + num + '\')"><span class="fe-num">' + num + '</span>' + name + '</div>';
+        });
+      }
+      h += '</div>';
+    }
+    return h;
+  }).join('');
+}
+
+function saveFigures() {
+  try { localStorage.setItem('pei_figures', JSON.stringify(figures)); } catch(e){}
 }
 
 // ============================================================
@@ -456,31 +770,42 @@ function switchTab(id, btn) {
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
   document.getElementById('p-' + id).classList.add('active');
   btn.classList.add('active');
+  if (id === 'figures') renderFigures();
 }
 
 // ============================================================
-// RENDER
+// RENDER — Element list
 // ============================================================
 function render() {
   var list = document.getElementById('elemList');
   var s = (document.getElementById('searchInput') || {}).value || '';
   s = s.toLowerCase();
   var f = elems.slice();
+  // Sort by number
+  f.sort(function(a, b) { return parseInt(a.num) - parseInt(b.num); });
   if (s) f = f.filter(function(e) { return e.name.indexOf(s) >= 0 || e.num.indexOf(s) >= 0; });
   if (filter === 'issues') f = f.filter(function(e) { return e.issues > 0; });
   else if (filter === 'manual') f = f.filter(function(e) { return e.source === 'manual'; });
   else if (filter === 'ok') f = f.filter(function(e) { return e.status === 'confirmed'; });
 
-  list.innerHTML = f.map(function(e) {
-    var a = selId === e.id, m = e.source === 'manual', b = '';
-    if (m) b += '<span class="bsm b-manual">M</span>';
-    if (e.issues > 0) b += '<span class="bsm b-issue">!' + e.issues + '</span>';
-    else if (e.status === 'confirmed') b += '<span class="bsm b-ok">OK</span>';
-    return '<div class="elem-row' + (a ? ' active' : '') + (m ? ' manual' : '') + '" onclick="sel_elem(\'' + e.id + '\')">' +
-      '<div class="e-num">' + e.num + '</div><div class="e-info"><div class="e-name">' + e.name + '</div>' +
-      '<div class="e-meta">' + e.refs + ' refs' + (e.variants.length ? ' · ' + e.variants.length + 'v' : '') + '</div></div>' +
-      '<div class="e-badges">' + b + '</div></div>';
-  }).join('');
+  if (f.length === 0 && elems.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">\ud83d\udccb</div><div class="empty-text">No elements yet.<br>Select text in Word or use the form above to add.</div></div>';
+  } else if (f.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-text">No matching elements.</div></div>';
+  } else {
+    list.innerHTML = f.map(function(e) {
+      var a = selId === e.id, m = e.source === 'manual', b = '';
+      if (m) b += '<span class="bsm b-manual">M</span>';
+      if (e.issues > 0) b += '<span class="bsm b-issue">!' + e.issues + '</span>';
+      else if (e.status === 'confirmed') b += '<span class="bsm b-ok">\u2713</span>';
+      return '<div class="elem-row' + (a ? ' active' : '') + (m && !a ? ' manual' : '') + '" onclick="sel_elem(\'' + e.id + '\')">' +
+        '<div class="e-num">' + e.num + '</div><div class="e-info"><div class="e-name">' + e.name + '</div>' +
+        '<div class="e-meta">' + e.refs + ' refs' + (e.variants.length ? ' \u00b7 ' + e.variants.length + 'v' : '') +
+        (e.figures && e.figures.length ? ' \u00b7 ' + e.figures.join(', ') : '') + '</div></div>' +
+        '<div class="e-badges">' + b + '</div>' +
+        '<div class="e-go" onclick="event.stopPropagation();scrollToElement(\'' + e.num + '\')" title="Go to document">\u279c</div></div>';
+    }).join('');
+  }
 
   document.getElementById('fAll').textContent = elems.length;
   document.getElementById('fIssues').textContent = elems.filter(function(e) { return e.issues > 0; }).length;
@@ -504,15 +829,54 @@ function sel_elem(id) {
   render();
   var e = elems.find(function(x) { return x.id === id; });
   if (!e) return;
+  if (!e.figures) e.figures = [];
+
   var inner = document.getElementById('detailInner');
-  var h = '<div class="dh"><div class="dh-num">' + e.num + '</div><button class="dh-close" onclick="closeDetail()">x</button></div>';
+  var h = '<div class="dh"><div class="dh-num">#' + e.num + '</div><div class="dh-actions">';
+  h += '<button class="dh-close" onclick="scrollToElement(\'' + e.num + '\')" title="Go to document">\u279c</button>';
+  h += '<button class="dh-close" onclick="deleteElem(\'' + e.id + '\')" title="Delete" style="color:var(--red)">\u2715</button>';
+  h += '<button class="dh-close" onclick="closeDetail()">\u2190</button>';
+  h += '</div></div>';
+
+  // Official Name
   h += '<div class="fg"><div class="fl">Official Name</div><div style="display:flex;gap:4px"><input class="fi" id="dName" value="' + e.name + '" style="flex:1"><button class="add-btn" style="padding:3px 7px;font-size:8px" onclick="saveName(\'' + e.id + '\')">Save</button></div></div>';
-  h += '<div class="fg"><div class="fl">Variants</div><input class="fi" id="dVariants" value="' + e.variants.join(', ') + '" placeholder="comma-separated..."><div class="fh">OK forms</div></div>';
+
+  // Variants
+  h += '<div class="fg"><div class="fl">Variants</div><input class="fi" id="dVariants" value="' + e.variants.join(', ') + '" placeholder="comma-separated..." onchange="saveVariants(\'' + e.id + '\')"><div class="fh">Accepted forms (auto-saved on change)</div></div>';
+
+  // Old Names
   h += '<div class="fg"><div class="fl">Old Names</div>';
-  if (e.oldNames.length) h += '<div>' + e.oldNames.map(function(n) { return '<span class="old-tag">' + n + '</span>'; }).join('') + '</div>';
-  h += '<div style="display:flex;gap:4px;margin-top:3px"><input class="fi" id="dOldName" placeholder="Add old name..." style="flex:1"><button class="add-btn" style="padding:3px 7px;font-size:8px" onclick="addOldName(\'' + e.id + '\')">+</button></div>';
-  h += '<div class="fh">Flagged as issues</div></div>';
-  h += '<div class="fg"><button class="add-btn" style="width:100%;padding:6px;background:var(--green);font-size:9px" onclick="confirmElem(\'' + e.id + '\')">' + (e.status === 'confirmed' ? '✓ Confirmed' : 'Confirm') + '</button></div>';
+  if (e.oldNames.length) {
+    h += '<div>' + e.oldNames.map(function(n, i) {
+      return '<span class="old-tag">' + n + '<span class="old-x" onclick="removeOldName(\'' + e.id + '\',' + i + ')">\u2715</span></span>';
+    }).join('') + '</div>';
+  }
+  h += '<div style="display:flex;gap:4px;margin-top:3px"><input class="fi" id="dOldName" placeholder="Add old name..." style="flex:1" onkeydown="if(event.key===\'Enter\')addOldName(\'' + e.id + '\')"><button class="add-btn" style="padding:3px 7px;font-size:8px" onclick="addOldName(\'' + e.id + '\')">+</button></div>';
+  h += '<div class="fh">Flagged as issues in inspection</div></div>';
+
+  // Figure assignment
+  h += '<div class="fg"><div class="fl">Figures</div>';
+  if (e.figures.length) {
+    h += '<div class="d-fig">' + e.figures.map(function(f) { return '<span class="d-fig-tag">' + f + '</span>'; }).join('') + '</div>';
+  }
+  if (figures.length > 0) {
+    h += '<div style="margin-top:3px"><select class="fi" id="dFigSelect" style="padding:3px 5px"><option value="">Assign to figure...</option>';
+    figures.forEach(function(fig) {
+      var assigned = e.figures.indexOf(fig.name) >= 0;
+      if (!assigned) h += '<option value="' + fig.name + '">' + fig.name + '</option>';
+    });
+    h += '</select></div>';
+    h += '<button class="add-btn" style="padding:3px 7px;font-size:8px;margin-top:3px" onclick="assignFromDetail(\'' + e.num + '\')">Assign</button>';
+  } else {
+    h += '<div class="fh">Add figures in the Figures tab first</div>';
+  }
+  h += '</div>';
+
+  // Confirm
+  h += '<div class="fg"><button class="add-btn" style="width:100%;padding:6px;font-size:9px;' +
+    (e.status === 'confirmed' ? 'background:var(--green)' : 'background:var(--acc)') + '" onclick="confirmElem(\'' + e.id + '\')">' +
+    (e.status === 'confirmed' ? '\u2713 Confirmed' : 'Confirm Element') + '</button></div>';
+
   inner.innerHTML = h;
   document.getElementById('detailPanel').classList.add('open');
 }
@@ -531,7 +895,7 @@ function saveName(id) {
   e.oldNames.push(e.name);
   e.name = newName;
   save(); render(); sel_elem(id);
-  toast('Name updated → ' + newName);
+  toast('Name updated \u2192 ' + newName);
 }
 
 function saveVariants(id) {
@@ -548,21 +912,47 @@ function addOldName(id) {
   if (!e) return;
   var val = document.getElementById('dOldName').value.trim().toLowerCase();
   if (!val) return;
+  if (e.oldNames.indexOf(val) >= 0) { toast('Already in old names'); return; }
   e.oldNames.push(val);
   save(); sel_elem(id);
   toast('Old name added: ' + val);
 }
 
+function removeOldName(id, idx) {
+  var e = elems.find(function(x) { return x.id === id; });
+  if (!e) return;
+  e.oldNames.splice(idx, 1);
+  save(); sel_elem(id);
+}
+
 function confirmElem(id) {
   var e = elems.find(function(x) { return x.id === id; });
   if (!e) return;
-  // Also save variants from input
   var varInput = document.getElementById('dVariants');
   if (varInput) {
     e.variants = varInput.value.split(',').map(function(v) { return v.trim().toLowerCase(); }).filter(Boolean);
   }
   e.status = e.status === 'confirmed' ? 'auto' : 'confirmed';
   save(); render(); sel_elem(id);
+  toast(e.status === 'confirmed' ? 'Element confirmed' : 'Confirmation removed');
+}
+
+function deleteElem(id) {
+  var e = elems.find(function(x) { return x.id === id; });
+  if (!e) return;
+  if (!confirm('Delete ' + e.name + ' ' + e.num + '?')) return;
+  elems = elems.filter(function(x) { return x.id !== id; });
+  closeDetail();
+  save(); render();
+  toast('Deleted: ' + e.name + ' ' + e.num);
+}
+
+function assignFromDetail(num) {
+  var sel = document.getElementById('dFigSelect');
+  if (!sel || !sel.value) return;
+  assignToFigure(sel.value, num);
+  sel_elem('e' + num);
+  toast('Assigned to ' + sel.value);
 }
 
 // ============================================================
@@ -571,13 +961,37 @@ function confirmElem(id) {
 function addManual() {
   var num = document.getElementById('addNum').value.trim();
   var name = document.getElementById('addName').value.trim().toLowerCase();
-  if (!num || !name) return;
-  if (elems.find(function(e) { return e.num === num; })) { toast('Element ' + num + ' already exists'); return; }
-  elems.push({ id: 'e' + num, num: num, name: name, variants: [], oldNames: [], source: 'manual', status: 'auto', refs: 0, issues: 0 });
+  if (!num || !name) { toast('Enter both number and name'); return; }
+  if (elems.find(function(e) { return e.num === num; })) { toast('Element #' + num + ' already exists'); return; }
+  elems.push({ id: 'e' + num, num: num, name: name, variants: [], oldNames: [], figures: [], source: 'manual', status: 'auto', refs: 0, issues: 0 });
   document.getElementById('addNum').value = '';
   document.getElementById('addName').value = '';
   save(); render(); sel_elem('e' + num);
   toast('Added: ' + name + ' ' + num);
+}
+
+// ============================================================
+// BULK IMPORT
+// ============================================================
+function bulkImport() {
+  var text = prompt('Paste elements (one per line):\nFormat: "device 50" or "50 device"');
+  if (!text) return;
+  var lines = text.split('\n');
+  var count = 0;
+  lines.forEach(function(line) {
+    line = line.trim();
+    if (!line) return;
+    var m = line.match(/^(.+?)\s+(\d{2,4}[A-Za-z]?)$/i) || line.match(/^(\d{2,4}[A-Za-z]?)\s+(.+)$/i);
+    if (!m) return;
+    var num, name;
+    if (/^\d/.test(m[1])) { num = m[1]; name = m[2]; } else { name = m[1]; num = m[2]; }
+    name = name.toLowerCase().trim();
+    if (elems.find(function(e) { return e.num === num; })) return;
+    elems.push({ id: 'e' + num, num: num, name: name, variants: [], oldNames: [], figures: [], source: 'bulk', status: 'auto', refs: 0, issues: 0 });
+    count++;
+  });
+  save(); render();
+  toast('Imported ' + count + ' elements');
 }
 
 // ============================================================
@@ -588,13 +1002,13 @@ function save() {
 }
 
 function exportJSON() {
-  var data = JSON.stringify(elems, null, 2);
+  var data = JSON.stringify({ elements: elems, figures: figures }, null, 2);
   var blob = new Blob([data], { type: 'application/json' });
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
-  a.href = url; a.download = 'pei-elements.json'; a.click();
+  a.href = url; a.download = 'pei-data.json'; a.click();
   URL.revokeObjectURL(url);
-  toast('Exported ' + elems.length + ' elements');
+  toast('Exported ' + elems.length + ' elements + ' + figures.length + ' figures');
 }
 
 function importJSON(ev) {
@@ -605,13 +1019,30 @@ function importJSON(ev) {
     try {
       var imported = JSON.parse(e.target.result);
       if (Array.isArray(imported)) {
+        // Legacy format (array of elements only)
         elems = imported;
-        save(); render();
-        toast('Imported ' + elems.length + ' elements');
+        elems.forEach(function(el) { if (!el.figures) el.figures = []; });
+      } else if (imported.elements) {
+        // New format
+        elems = imported.elements;
+        elems.forEach(function(el) { if (!el.figures) el.figures = []; });
+        if (imported.figures) figures = imported.figures;
       }
+      save(); saveFigures(); render();
+      toast('Imported ' + elems.length + ' elements');
     } catch(err) { toast('Invalid JSON file'); }
   };
   reader.readAsText(file);
+  ev.target.value = ''; // Reset so same file can be imported again
+}
+
+function clearAllData() {
+  if (!confirm('Delete ALL elements and figures? This cannot be undone.')) return;
+  elems = [];
+  figures = [];
+  save(); saveFigures(); render(); renderFigures();
+  closeDetail();
+  toast('All data cleared');
 }
 
 // ============================================================
@@ -621,13 +1052,15 @@ function toast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 2000);
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function() { t.classList.remove('show'); }, 2200);
 }
 
 // ============================================================
 // INIT
 // ============================================================
 render();
+renderFigures();
 </script>
 </body>
 </html>
