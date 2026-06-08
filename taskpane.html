@@ -8,7 +8,7 @@
 <meta http-equiv="Expires" content="0">
 <script>
 // Force cache bust — change PEI_VER on each deploy
-var PEI_VER = '094';
+var PEI_VER = '098';
 try {
   if (!sessionStorage.getItem('pei_loaded_' + PEI_VER)) {
     sessionStorage.clear();
@@ -229,7 +229,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.9.4</div>
+  <div class="ver">v0.9.8</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
@@ -241,10 +241,11 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 
 <!-- ELEMENTS -->
 <div class="panel active" id="p-elements">
-  <div class="sel-bar">
+  <div class="sel-bar" id="selBar">
     <span style="font-size:11px">&#10022;</span>
     <span class="sel-text" id="selText">Select text in document...</span>
-    <button class="sel-btn" id="selBtn" onclick="addFromSelection()" disabled>+ Add Selected</button>
+    <button class="sel-btn" id="selBtnElem" onclick="addFromSelection()" disabled style="background:var(--acc);color:#fff;font-size:8px;padding:3px 8px">+ Element</button>
+    <button class="sel-btn" id="selBtnDict" onclick="addDictFromSelection()" disabled style="background:#7c3aed;color:#fff;font-size:8px;padding:3px 8px">+ Dictionary</button>
   </div>
   <div class="add-form">
     <input class="num-input" placeholder="#" id="addNum" maxlength="5">
@@ -252,16 +253,11 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
     <button class="add-btn" onclick="addManual()">Add</button>
   </div>
   <div style="padding:8px 10px;background:rgba(8,145,178,.06);border-bottom:1px solid rgba(8,145,178,.15)">
-    <div style="font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#0891b2;margin-bottom:4px">&#9889; Quick Insert &mdash; $element or @dictionary</div>
-    <div style="display:flex;gap:4px;position:relative">
-      <input id="qiInput" placeholder="$50 or @pattern" oninput="onQiInput()" onkeydown="onQiKey(event)" style="flex:1;padding:5px 8px;font-size:11px;border:1px solid var(--brd2);border-radius:4px;background:#fff;color:var(--tx);outline:none;font-family:monospace">
-      <button id="qiBtn" onclick="qiInsert()" disabled style="padding:5px 10px;background:#0891b2;color:#fff;border:none;border-radius:4px;font-size:9px;font-weight:600;cursor:pointer">Insert</button>
-      <div id="qiDropdown" style="display:none;position:absolute;top:100%;left:0;right:50px;background:#fff;border:1px solid var(--brd2);border-radius:4px;z-index:50;max-height:160px;overflow-y:auto;margin-top:2px"></div>
-    </div>
-    <div id="autoDetectBar" style="display:none;margin-top:6px;padding:6px 8px;background:#fff;border:1px solid #0891b2;border-radius:4px">
+    <div id="autoDetectBar" style="display:none;padding:6px 8px;background:#fff;border:1px solid #0891b2;border-radius:4px">
       <div style="font-size:8px;font-weight:600;color:#0891b2;margin-bottom:4px">DETECTED IN DOCUMENT</div>
       <div id="autoDetectList"></div>
     </div>
+    <div id="autoDetectEmpty" style="font-size:9px;color:var(--tx3)">Type <b>$number</b> or <b>$name</b> in document to quick-insert elements</div>
   </div>
   <div class="search-bar"><input placeholder="Search..." id="searchInput" oninput="render()"></div>
   <div class="filter-bar" id="filterBar">
@@ -315,7 +311,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
     <div id="ecConfigPanel"></div>
 
     <div style="margin-top:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px">About</div>
-    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.9.4<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
+    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.9.8<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
   </div>
 </div>
 
@@ -425,16 +421,19 @@ function checkSelection() {
     para.load('text');
     return ctx.sync().then(function() {
       var text = (sel.text || '').trim();
-      var btn = document.getElementById('selBtn');
+      var btnE = document.getElementById('selBtnElem');
+      var btnD = document.getElementById('selBtnDict');
       var label = document.getElementById('selText');
       if (text && text.length > 2) {
-        label.textContent = '"' + text + '"';
+        label.textContent = '"' + (text.length > 40 ? text.substring(0,40) + '...' : text) + '"';
         label.style.fontWeight = '600';
-        btn.disabled = false;
+        btnE.disabled = false;
+        btnD.disabled = false;
       } else {
         label.textContent = 'Select text in document...';
         label.style.fontWeight = '400';
-        btn.disabled = true;
+        btnE.disabled = true;
+        btnD.disabled = true;
       }
       // Auto-detect $keyword patterns
       var paraText = para.isNullObject ? '' : (para.text || '');
@@ -455,9 +454,9 @@ function checkSelection() {
               '<span style="font-size:8px;padding:2px 6px;background:#0891b2;color:#fff;border-radius:3px">Replace</span></div>';
           }
         }
-        if (found) { adList.innerHTML = html; adBar.style.display = 'block'; }
-        else { adBar.style.display = 'none'; }
-      } else { adBar.style.display = 'none'; }
+        if (found) { adList.innerHTML = html; adBar.style.display = 'block'; document.getElementById('autoDetectEmpty').style.display = 'none'; }
+        else { adBar.style.display = 'none'; document.getElementById('autoDetectEmpty').style.display = 'block'; }
+      } else { adBar.style.display = 'none'; document.getElementById('autoDetectEmpty').style.display = 'block'; }
     });
   }).catch(function(){});
 }
@@ -485,10 +484,34 @@ function addFromSelection() {
           toast('Updated ' + num + ' → ' + name);
         }
       } else {
-        elems.push({ id:'e'+num, num:num, name:name, variants:[], oldNames:[], source:'drag', status:'auto', refs:0, issues:0 });
+        elems.push({ id:'e'+num, num:num, name:name, variants:[], oldNames:[], source:'drag', status:'confirmed', refs:0, issues:0 });
         toast('Registered: ' + name + ' ' + num);
       }
-      save(); render(); sel_elem('e'+num);
+      save(); render();
+    });
+  }).catch(function(e){ toast('Error: ' + e.message); });
+}
+
+function addDictFromSelection() {
+  if (!officeReady) return;
+  Word.run(function(ctx) {
+    var sel = ctx.document.getSelection();
+    sel.load('text');
+    return ctx.sync().then(function() {
+      var text = (sel.text || '').trim();
+      if (!text) return;
+      // Use first word as keyword, rest as text. Or just use full text.
+      var words = text.split(/\s+/);
+      var keyword = words[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (!keyword) { toast('Cannot extract keyword'); return; }
+      if (dict.find(function(d){ return d.keyword === keyword; })) {
+        toast('@' + keyword + ' already exists');
+        return;
+      }
+      dict.push({ id: 'd' + Date.now(), keyword: keyword, text: text });
+      saveDict(); renderDict();
+      toast('Added to dictionary: @' + keyword);
+      switchTab('dict', document.querySelectorAll('.tab')[1]);
     });
   }).catch(function(e){ toast('Error: ' + e.message); });
 }
@@ -1208,40 +1231,12 @@ function clearHighlights() {
   if (!officeReady) return;
   Word.run(function(ctx) {
     var body = ctx.document.body;
-
-    var allSearches = [];
-
-    elems.forEach(function(el) {
-      if (!el.name || !el.num) return;
-      var patterns = [el.name + ' ' + el.num];
-      el.variants.forEach(function(v) { if (v) patterns.push(v + ' ' + el.num); });
-      el.oldNames.forEach(function(o) { if (o) patterns.push(o + ' ' + el.num); });
-      patterns.forEach(function(p) {
-        var r = body.search(p, { matchCase: false });
-        r.load('items');
-        allSearches.push(r);
-      });
-    });
-
-    // Also clear conflict-highlighted text from inspection results
-    (_inspIssues || []).forEach(function(iss) {
-      if (iss.searchText) {
-        var r = body.search(iss.searchText, { matchCase: false });
-        r.load('items');
-        allSearches.push(r);
-      }
-    });
-
-    var broadPat = body.search('[0-9][0-9]', { matchCase: false, matchWholeWord: false, matchWildcards: false });
-    broadPat.load('items');
-    allSearches.push(broadPat);
+    // Clear ALL highlights from the entire document body at once
+    body.font.highlightColor = null;
+    body.font.underline = 'None';
+    body.font.underlineColor = null;
 
     return ctx.sync().then(function() {
-      allSearches.forEach(function(r) {
-        r.items.forEach(function(item) { item.font.highlightColor = null; item.font.underline = 'None'; item.font.underlineColor = null; });
-      });
-      return ctx.sync();
-    }).then(function() {
       _lastScrollMarked = null;
 
       // Clear inspection results UI
@@ -1315,11 +1310,10 @@ function scrollToElement(num, searchText) {
       results.load('items');
       return ctx.sync().then(function() {
         if (results.items.length > 0) {
-          // Select (scroll to) first match
-          results.items[0].select();
-          // Apply thick blue underline to mark it
+          // Scroll into view without selecting (avoids gray selection overlay)
           results.items[0].font.underline = 'Thick';
           results.items[0].font.underlineColor = '#2563eb';
+          results.items[0].scrollIntoView();
         }
         _lastScrollMarked = { text: pattern };
         return ctx.sync();
@@ -1355,13 +1349,13 @@ function render() {
 
   list.innerHTML = f.map(function(e) {
     var a = selId === e.id, m = e.source === 'manual', b = '';
-    if (m) b += '<span class="bsm b-manual">M</span>';
     if (e.issues > 0) b += '<span class="bsm b-issue">!' + e.issues + '</span>';
-    else if (e.status === 'confirmed') b += '<span class="bsm b-ok">OK</span>';
-    return '<div class="elem-row' + (a ? ' active' : '') + (m ? ' manual' : '') + '" onclick="sel_elem(\'' + e.id + '\')">' +
+    else b += '<span class="bsm b-ok">OK</span>';
+    return '<div class="elem-row' + (a ? ' active' : '') + (m ? ' manual' : '') + '" onclick="highlightElement(\'' + e.id + '\')">' +
       '<div class="e-num">' + e.num + '</div><div class="e-info"><div class="e-name">' + e.name + '</div>' +
       '<div class="e-meta">' + e.refs + ' refs' + (e.variants.length ? ' · ' + e.variants.length + 'v' : '') + '</div></div>' +
       '<div class="e-badges">' + b + '</div>' +
+      '<div style="font-size:9px;color:var(--tx3);cursor:pointer;padding:2px 4px" onclick="event.stopPropagation();sel_elem(\'' + e.id + '\')" title="Edit">&#9998;</div>' +
       '<div style="font-size:9px;color:var(--tx3);cursor:pointer;padding:2px 4px" onclick="event.stopPropagation();scrollToElement(\'' + e.num + '\')" title="Go to document">&gt;</div></div>';
   }).join('');
 
@@ -1400,7 +1394,6 @@ function sel_elem(id) {
   if (e.oldNames.length) h += '<div>' + e.oldNames.map(function(n, idx) { return '<span class="old-tag">' + n + ' <span style="cursor:pointer;opacity:.5;font-size:7px" onclick="removeOldName(\'' + e.id + '\',' + idx + ')">x</span></span>'; }).join('') + '</div>';
   h += '<div style="display:flex;gap:4px;margin-top:3px"><input class="fi" id="dOldName" placeholder="Add old name..." style="flex:1"><button class="add-btn" style="padding:3px 7px;font-size:8px" onclick="addOldName(\'' + e.id + '\')">+</button></div>';
   h += '<div class="fh">Flagged as issues</div></div>';
-  h += '<div class="fg"><button class="add-btn" style="width:100%;padding:6px;background:var(--green);font-size:9px" onclick="confirmElem(\'' + e.id + '\')">' + (e.status === 'confirmed' ? '✓ Confirmed' : 'Confirm') + '</button></div>';
   inner.innerHTML = h;
   document.getElementById('detailPanel').classList.add('open');
 }
@@ -1481,7 +1474,7 @@ function addManual() {
   var name = document.getElementById('addName').value.trim().toLowerCase();
   if (!num || !name) return;
   if (elems.find(function(e) { return e.num === num; })) { toast('Element ' + num + ' already exists'); return; }
-  elems.push({ id: 'e' + num, num: num, name: name, variants: [], oldNames: [], source: 'manual', status: 'auto', refs: 0, issues: 0 });
+  elems.push({ id: 'e' + num, num: num, name: name, variants: [], oldNames: [], source: 'manual', status: 'confirmed', refs: 0, issues: 0 });
   document.getElementById('addNum').value = '';
   document.getElementById('addName').value = '';
   save(); render(); sel_elem('e' + num);
@@ -1513,7 +1506,7 @@ function bulkImport() {
       if (/^\d/.test(m[1])) { num = m[1]; name = m[2]; } else { name = m[1]; num = m[2]; }
       name = name.toLowerCase().trim();
       if (elems.find(function(e) { return e.num === num; })) continue;
-      elems.push({ id: 'e' + num, num: num, name: name, variants: [], oldNames: [], source: 'bulk', status: 'auto', refs: 0, issues: 0 });
+      elems.push({ id: 'e' + num, num: num, name: name, variants: [], oldNames: [], source: 'bulk', status: 'confirmed', refs: 0, issues: 0 });
       count++;
     }
     save(); render();
