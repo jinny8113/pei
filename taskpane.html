@@ -113,6 +113,20 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 .toast.show{display:block;animation:fadeIn .2s}
 @keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
+/* Confirm Modal */
+.confirm-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.35);z-index:200;display:flex;align-items:center;justify-content:center;animation:fadeInOverlay .15s}
+@keyframes fadeInOverlay{from{opacity:0}to{opacity:1}}
+.confirm-box{background:#fff;border-radius:8px;padding:16px 18px;max-width:280px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.confirm-msg{font-size:11px;color:var(--tx);line-height:1.5;margin-bottom:14px}
+.confirm-btns{display:flex;gap:8px;justify-content:flex-end}
+.confirm-btns button{padding:6px 16px;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;border:none}
+.confirm-cancel{background:var(--bg3);color:var(--tx2)}
+.confirm-cancel:hover{background:var(--bg4)}
+.confirm-ok{background:var(--red);color:#fff}
+.confirm-ok:hover{background:#b91c1c}
+.confirm-ok.blue{background:var(--acc)}
+.confirm-ok.blue:hover{background:var(--acc2)}
+
 /* Scrollbar */
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--brd2);border-radius:2px}
 
@@ -292,6 +306,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 </div>
 
 <div class="toast" id="toast"></div>
+<div id="confirmModal" style="display:none"></div>
 
 <script>
 // ============================================================
@@ -873,12 +888,13 @@ function removeOldName(id, idx) {
 function deleteElem(id) {
   var e = elems.find(function(x) { return x.id === id; });
   if (!e) return;
-  if (!confirm('Delete ' + e.name + ' ' + e.num + '?')) return;
-  if (highlightedElemId === id) { clearElementHighlight(null); }
-  elems = elems.filter(function(x) { return x.id !== id; });
-  closeDetail();
-  save(); render();
-  toast('Deleted: ' + e.name + ' ' + e.num);
+  peiConfirm('Delete <b>' + e.name + ' ' + e.num + '</b>?', function() {
+    if (highlightedElemId === id) { clearElementHighlight(null); }
+    elems = elems.filter(function(x) { return x.id !== id; });
+    closeDetail();
+    save(); render();
+    toast('Deleted: ' + e.name + ' ' + e.num);
+  });
 }
 
 function confirmElem(id) {
@@ -941,13 +957,14 @@ function bulkImport() {
 }
 
 function clearAllData() {
-  if (!confirm('Delete ALL elements and dictionary? This cannot be undone.')) return;
-  elems = [];
-  dict = [];
-  highlightedElemId = null;
-  save(); saveDict(); render(); renderDict();
-  closeDetail();
-  toast('All data cleared');
+  peiConfirm('Delete <b>ALL</b> elements and dictionary?<br>This cannot be undone.', function() {
+    elems = [];
+    dict = [];
+    highlightedElemId = null;
+    save(); saveDict(); render(); renderDict();
+    closeDetail();
+    toast('All data cleared');
+  });
 }
 
 // ============================================================
@@ -1006,6 +1023,30 @@ function toast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(function() { t.classList.remove('show'); }, 2000);
+}
+
+// Custom confirm dialog (Office Add-in blocks native confirm())
+function peiConfirm(msg, onOk, colorClass) {
+  var modal = document.getElementById('confirmModal');
+  var cls = colorClass || '';
+  modal.innerHTML = '<div class="confirm-overlay" onclick="peiConfirmClose()">' +
+    '<div class="confirm-box" onclick="event.stopPropagation()">' +
+    '<div class="confirm-msg">' + msg + '</div>' +
+    '<div class="confirm-btns">' +
+    '<button class="confirm-cancel" onclick="peiConfirmClose()">Cancel</button>' +
+    '<button class="confirm-ok ' + cls + '" id="confirmOkBtn">OK</button>' +
+    '</div></div></div>';
+  modal.style.display = 'block';
+  document.getElementById('confirmOkBtn').onclick = function() {
+    peiConfirmClose();
+    if (onOk) onOk();
+  };
+}
+
+function peiConfirmClose() {
+  var modal = document.getElementById('confirmModal');
+  modal.style.display = 'none';
+  modal.innerHTML = '';
 }
 
 // ============================================================
@@ -1800,18 +1841,19 @@ function ecRemoveUserSkip(word) {
 
 // --- Reset all ---
 function ecResetAllConfig() {
-  if (!confirm('Reset all element detection settings to defaults? This cannot be undone.')) return;
-  _elemConfig = {
-    disabledSkipWords: [], userSkipWords: [],
-    disabledValidWords: [], userValidWords: [],
-    disabledFpPatterns: [], userFpPatterns: [],
-    disabledStripWords3: [], userStripWords3: [],
-    disabledStripWords5: [], userStripWords5: [],
-    disabledOrdinals: [], userOrdinals: [],
-    matchMode: 'strict', maxIssuesPerElement: 5
-  };
-  ecSave(); renderElemConfig();
-  toast('All settings reset to defaults');
+  peiConfirm('Reset all element detection settings to defaults?<br>This cannot be undone.', function() {
+    _elemConfig = {
+      disabledSkipWords: [], userSkipWords: [],
+      disabledValidWords: [], userValidWords: [],
+      disabledFpPatterns: [], userFpPatterns: [],
+      disabledStripWords3: [], userStripWords3: [],
+      disabledStripWords5: [], userStripWords5: [],
+      disabledOrdinals: [], userOrdinals: [],
+      matchMode: 'strict', maxIssuesPerElement: 5
+    };
+    ecSave(); renderElemConfig();
+    toast('All settings reset to defaults');
+  });
 }
 
 // ============================================================
