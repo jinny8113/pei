@@ -8,7 +8,7 @@
 <meta http-equiv="Expires" content="0">
 <script>
 // Force cache bust — change PEI_VER on each deploy
-var PEI_VER = '098';
+var PEI_VER = '099';
 try {
   if (!sessionStorage.getItem('pei_loaded_' + PEI_VER)) {
     sessionStorage.clear();
@@ -229,7 +229,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.9.8</div>
+  <div class="ver">v0.9.9</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
@@ -257,7 +257,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
       <div style="font-size:8px;font-weight:600;color:#0891b2;margin-bottom:4px">DETECTED IN DOCUMENT</div>
       <div id="autoDetectList"></div>
     </div>
-    <div id="autoDetectEmpty" style="font-size:9px;color:var(--tx3)">Type <b>$number</b> or <b>$name</b> in document to quick-insert elements</div>
+    <div id="autoDetectEmpty" style="font-size:9px;color:var(--tx3)">Type <b>$number</b> or <b>$name</b> for elements, <b>@keyword</b> for dictionary</div>
   </div>
   <div class="search-bar"><input placeholder="Search..." id="searchInput" oninput="render()"></div>
   <div class="filter-bar" id="filterBar">
@@ -311,7 +311,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
     <div id="ecConfigPanel"></div>
 
     <div style="margin-top:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px">About</div>
-    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.9.8<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
+    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.9.9<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
   </div>
 </div>
 
@@ -435,13 +435,16 @@ function checkSelection() {
         btnE.disabled = true;
         btnD.disabled = true;
       }
-      // Auto-detect $keyword patterns
+      // Auto-detect $element and @dictionary patterns
       var paraText = para.isNullObject ? '' : (para.text || '');
-      var dollarMatches = paraText.match(/\$[A-Za-z0-9]{1,20}/g);
+      var dollarMatches = paraText.match(/\$[A-Za-z0-9]{1,20}/g) || [];
+      var atMatches = paraText.match(/@[A-Za-z0-9]{1,30}/g) || [];
       var adBar = document.getElementById('autoDetectBar');
       var adList = document.getElementById('autoDetectList');
-      if (dollarMatches && dollarMatches.length > 0 && elems.length > 0) {
-        var html = '', found = false;
+      var html = '', found = false;
+
+      // $ → element matches
+      if (dollarMatches.length > 0 && elems.length > 0) {
         for (var di = 0; di < dollarMatches.length; di++) {
           var dMatch = dollarMatches[di];
           var dQuery = dMatch.substring(1).toLowerCase();
@@ -454,9 +457,26 @@ function checkSelection() {
               '<span style="font-size:8px;padding:2px 6px;background:#0891b2;color:#fff;border-radius:3px">Replace</span></div>';
           }
         }
-        if (found) { adList.innerHTML = html; adBar.style.display = 'block'; document.getElementById('autoDetectEmpty').style.display = 'none'; }
-        else { adBar.style.display = 'none'; document.getElementById('autoDetectEmpty').style.display = 'block'; }
-      } else { adBar.style.display = 'none'; document.getElementById('autoDetectEmpty').style.display = 'block'; }
+      }
+
+      // @ → dictionary matches
+      if (atMatches.length > 0 && dict.length > 0) {
+        for (var ai = 0; ai < atMatches.length; ai++) {
+          var aMatch = atMatches[ai];
+          var aQuery = aMatch.substring(1).toLowerCase();
+          var dMatched = dict.filter(function(d) { return d.keyword.indexOf(aQuery) === 0 || d.text.toLowerCase().indexOf(aQuery) >= 0; }).slice(0, 5);
+          for (var ami = 0; ami < dMatched.length; ami++) {
+            var dEntry = dMatched[ami]; found = true;
+            html += '<div style="display:flex;align-items:center;padding:3px 0;cursor:pointer;gap:6px" onclick="autoReplaceDict(\'' + aMatch.replace(/'/g, "\\'") + '\',\'' + dEntry.id + '\')">' +
+              '<span style="font-family:monospace;font-weight:700;color:#7c3aed;min-width:40px">' + aMatch + '</span>' +
+              '<span style="font-size:10px;color:var(--tx);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + dEntry.text + '</span>' +
+              '<span style="font-size:8px;padding:2px 6px;background:#7c3aed;color:#fff;border-radius:3px">Replace</span></div>';
+          }
+        }
+      }
+
+      if (found) { adList.innerHTML = html; adBar.style.display = 'block'; document.getElementById('autoDetectEmpty').style.display = 'none'; }
+      else { adBar.style.display = 'none'; document.getElementById('autoDetectEmpty').style.display = 'block'; }
     });
   }).catch(function(){});
 }
@@ -533,6 +553,25 @@ function autoReplace(searchPattern, elemId) {
     }).then(function() {
       toast('Replaced: ' + searchPattern + ' → ' + replaceText);
       document.getElementById('autoDetectBar').style.display = 'none';
+      document.getElementById('autoDetectEmpty').style.display = 'block';
+    });
+  }).catch(function(e) { toast('Replace error: ' + e.message); });
+}
+
+function autoReplaceDict(searchPattern, dictId) {
+  if (!officeReady) return;
+  var d = dict.find(function(x) { return x.id === dictId; });
+  if (!d) return;
+  Word.run(function(ctx) {
+    var results = ctx.document.body.search(searchPattern, { matchCase: false, matchWholeWord: false });
+    results.load('items');
+    return ctx.sync().then(function() {
+      if (results.items.length > 0) results.items[0].insertText(d.text, 'Replace');
+      return ctx.sync();
+    }).then(function() {
+      toast('Replaced: ' + searchPattern + ' → ' + (d.text.length > 30 ? d.text.substring(0,30) + '...' : d.text));
+      document.getElementById('autoDetectBar').style.display = 'none';
+      document.getElementById('autoDetectEmpty').style.display = 'block';
     });
   }).catch(function(e) { toast('Replace error: ' + e.message); });
 }
