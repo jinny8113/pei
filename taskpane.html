@@ -211,7 +211,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.7.0</div>
+  <div class="ver">v0.8.0</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
@@ -296,7 +296,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
     <div id="ecConfigPanel"></div>
 
     <div style="margin-top:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px">About</div>
-    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.7.0<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
+    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.8.0<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
   </div>
 </div>
 
@@ -640,8 +640,144 @@ function clearElementHighlight(callback) {
 }
 
 // ============================================================
-// INSPECTION — Search document + highlight
+// INSPECTION — Search, Highlight + Name Consistency Check
 // ============================================================
+
+// --- Core analysis helpers (ported from Workbench v18) ---
+function _last5(raw) {
+  var words = raw.toLowerCase().trim().split(/\s+/);
+  var ordinals = {};
+  _getActiveOrdinals().forEach(function(w){ ordinals[w] = true; });
+  var clean = words.filter(function(w){ return !ordinals[w]; });
+  var t = Math.min(5, clean.length);
+  return t > 0 ? clean.slice(-t) : [];
+}
+
+function _getArtForm(raw) {
+  var words = _last5(raw);
+  var articles = { a:1, an:1, the:1 };
+  var lastIdx = -1;
+  for (var i = 0; i < words.length; i++) { if (articles[words[i]]) lastIdx = i; }
+  if (lastIdx < 0) return null;
+  return words.slice(lastIdx).join(' ');
+}
+
+function _getNoArtForm(raw) { return _last5(raw).join(' '); }
+
+function _stripArt(phrase) {
+  var articles = { a:1, an:1, the:1 };
+  return phrase.split(/\s+/).filter(function(w){ return !articles[w]; }).join(' ');
+}
+
+function _buildReps(mentions) {
+  var artFreq = {}, noArtFreq = {};
+  for (var i = 0; i < mentions.length; i++) {
+    var raw = (mentions[i].nameUsed || '').toLowerCase().trim();
+    if (!raw) continue;
+    var af = _getArtForm(raw);
+    if (af) { artFreq[af] = (artFreq[af] || 0) + 1; }
+    else { var naf = _getNoArtForm(raw); if (naf) noArtFreq[naf] = (noArtFreq[naf] || 0) + 1; }
+  }
+  function best(freq) {
+    var top = '', topN = 0;
+    for (var k in freq) { if (freq[k] > topN || (freq[k] === topN && k.length > top.length)) { top = k; topN = freq[k]; } }
+    return top;
+  }
+  var artRep = best(artFreq);
+  var noArtRep = best(noArtFreq);
+  return {
+    artRep: artRep,
+    artRepNoArt: artRep ? _stripArt(artRep) : '',
+    noArtRep: noArtRep,
+    displayName: artRep || noArtRep
+  };
+}
+
+function _classifyMent(mention, reps) {
+  var raw = (mention.nameUsed || '').toLowerCase().trim();
+  if (!raw) return 'exact';
+  var af = _getArtForm(raw);
+  if (af !== null) {
+    if (!reps.artRep) {
+      var afNoArt = _stripArt(af);
+      if (afNoArt !== reps.noArtRep) return 'conflict';
+      return 'article';
+    }
+    var afNoArt2 = _stripArt(af);
+    if (afNoArt2 !== reps.artRepNoArt) return 'conflict';
+    if (af !== reps.artRep) return 'article';
+    return 'exact';
+  } else {
+    var naf = _getNoArtForm(raw);
+    if (reps.noArtRep) {
+      if (naf !== reps.noArtRep) return 'review';
+      return 'exact';
+    }
+    if (reps.artRepNoArt) {
+      if (naf !== reps.artRepNoArt && !reps.artRepNoArt.endsWith(naf) && !naf.endsWith(reps.artRepNoArt)) return 'conflict';
+      return 'article';
+    }
+    return 'exact';
+  }
+}
+
+// --- Document scanning ---
+function _scanDocMentions(paragraphs) {
+  // Returns: { "100": [{ nameUsed, paraIdx, text }], ... }
+  var mentionMap = {};
+  var skipWords = {};
+  _getActiveSkipWords().forEach(function(w){ skipWords[w] = true; });
+  var validWords = {};
+  _getActiveValidWords().forEach(function(w){ validWords[w] = true; });
+
+  // FP patterns
+  var defaultFps = _getDefaultFpPatterns();
+  var disabledFps = {};
+  (_elemConfig.disabledFpPatterns || []).forEach(function(id){ disabledFps[id] = true; });
+  var fpRegexes = [];
+  defaultFps.forEach(function(fp){ if (!disabledFps[fp.id]) { try { fpRegexes.push(new RegExp(fp.pattern, 'i')); } catch(e){} } });
+  (_elemConfig.userFpPatterns || []).forEach(function(fp){ try { fpRegexes.push(new RegExp(fp.pattern, 'i')); } catch(e){} });
+
+  var leadingAM = /^(the|a|an|said|each|one|some|any|this|that|these|those|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|corresponding|respective|overlying|underlying|adjacent|upper|lower|top|bottom|left|right|inner|outer|front|rear|lateral|medial|proximal|distal|primary|secondary|main|multiple|plural|single|entire|whole|given|certain|particular|various|several|different|same|remaining|opposite|additional)\s+/gi;
+
+  function normName(raw) {
+    var n = raw.trim().toLowerCase();
+    for (var pass = 0; pass < 3; pass++) { var prev = n; n = n.replace(leadingAM, '').trim(); if (n === prev) break; }
+    return n;
+  }
+
+  for (var pi = 0; pi < paragraphs.length; pi++) {
+    var pText = paragraphs[pi];
+    var pat = /\b([a-zA-Z][a-zA-Z\s]{1,40}?)\s+(\d{2,4}[A-Za-z]?)\b/g;
+    var m;
+    while ((m = pat.exec(pText)) !== null) {
+      var rawName = m[1];
+      var num = m[2];
+
+      // FP check
+      var isFp = false;
+      for (var fi = 0; fi < fpRegexes.length; fi++) {
+        if (fpRegexes[fi].test(rawName.trim())) { isFp = true; break; }
+      }
+      if (isFp) continue;
+
+      var core = normName(rawName);
+      if (core.length < 2) continue;
+
+      var coreWords = core.split(/\s+/);
+      var firstW = coreWords[0];
+      var isSingleValid = coreWords.length === 1 && validWords[core];
+      if (!isSingleValid && skipWords[firstW]) continue;
+      if (!isSingleValid && coreWords.every(function(w){ return skipWords[w]; })) continue;
+      if (coreWords.length === 1 && !validWords[core]) continue;
+
+      if (!mentionMap[num]) mentionMap[num] = [];
+      mentionMap[num].push({ nameUsed: rawName.trim(), paraIdx: pi, context: rawName.trim() + ' ' + num });
+    }
+  }
+  return mentionMap;
+}
+
 function runInspection() {
   if (!officeReady) { toast('Not connected to Word'); return; }
 
@@ -650,58 +786,68 @@ function runInspection() {
 
   Word.run(function(ctx) {
     var body = ctx.document.body;
+    // Load paragraphs for consistency check
+    var paras = body.paragraphs;
+    paras.load('items');
     body.load('text');
     return ctx.sync().then(function() {
-      var docText = body.text;
+      // Collect paragraph texts
+      var paraTexts = [];
+      for (var i = 0; i < paras.items.length; i++) {
+        paras.items[i].load('text');
+      }
+      return ctx.sync();
+    }).then(function() {
+      var paraTexts = [];
+      for (var i = 0; i < paras.items.length; i++) {
+        paraTexts.push(paras.items[i].text || '');
+      }
 
-      // For each registered element, search document
-      var promises = [];
+      // --- Phase 1: Highlight (existing logic) ---
+      var highlightPromises = [];
       elems.forEach(function(el) {
         el.refs = 0;
         el.issues = 0;
 
-        // Search official name + number
+        // Official name
         var officialPattern = el.name + ' ' + el.num;
         var results = body.search(officialPattern, { matchCase: false, matchWholeWord: false });
         results.load('items');
-        promises.push({ elem: el, type: 'official', results: results });
+        highlightPromises.push({ elem: el, type: 'official', results: results });
 
-        // Search variants
+        // Variants
         el.variants.forEach(function(v) {
-          var vPattern = v + ' ' + el.num;
-          var vResults = body.search(vPattern, { matchCase: false, matchWholeWord: false });
+          if (!v) return;
+          var vResults = body.search(v + ' ' + el.num, { matchCase: false, matchWholeWord: false });
           vResults.load('items');
-          promises.push({ elem: el, type: 'variant', results: vResults, variant: v });
+          highlightPromises.push({ elem: el, type: 'variant', results: vResults, variant: v });
         });
 
-        // Search old names
+        // Old names
         el.oldNames.forEach(function(old) {
-          var oPattern = old + ' ' + el.num;
-          var oResults = body.search(oPattern, { matchCase: false, matchWholeWord: false });
+          if (!old) return;
+          var oResults = body.search(old + ' ' + el.num, { matchCase: false, matchWholeWord: false });
           oResults.load('items');
-          promises.push({ elem: el, type: 'oldname', results: oResults, oldName: old });
+          highlightPromises.push({ elem: el, type: 'oldname', results: oResults, oldName: old });
         });
       });
 
       return ctx.sync().then(function() {
-        // Process results — apply highlights
-        promises.forEach(function(p) {
+        // Apply highlights
+        highlightPromises.forEach(function(p) {
           var count = p.results.items.length;
           if (p.type === 'official') {
             p.elem.refs += count;
             totalMatches += count;
-            // Green highlight
             p.results.items.forEach(function(r) { r.font.highlightColor = 'Lime'; });
           } else if (p.type === 'variant') {
             p.elem.refs += count;
             totalMatches += count;
-            // Yellow highlight
             p.results.items.forEach(function(r) { r.font.highlightColor = 'Yellow'; });
           } else if (p.type === 'oldname') {
             totalMatches += count;
             if (count > 0) {
               p.elem.issues++;
-              // Pink highlight
               p.results.items.forEach(function(r) { r.font.highlightColor = 'Pink'; });
               issues.push({
                 type: 'old',
@@ -713,7 +859,62 @@ function runInspection() {
           }
         });
 
-        // Check orphans
+        // --- Phase 2: Consistency Check ---
+        var mentionMap = _scanDocMentions(paraTexts);
+        var maxIssues = _elemConfig.maxIssuesPerElement || 5;
+
+        // Build element lookup by number
+        var elemByNum = {};
+        elems.forEach(function(el) { elemByNum[el.num] = el; });
+
+        // For each registered element, check name consistency
+        for (var num in mentionMap) {
+          var el = elemByNum[num];
+          if (!el) {
+            // Unregistered element detected in document
+            var names = {};
+            mentionMap[num].forEach(function(m) {
+              var n = m.nameUsed.toLowerCase();
+              names[n] = (names[n] || 0) + 1;
+            });
+            var topName = '', topCount = 0;
+            for (var n in names) { if (names[n] > topCount) { topName = n; topCount = names[n]; } }
+            issues.push({
+              type: 'unregistered',
+              num: num,
+              desc: '"' + topName + ' ' + num + '" found ' + mentionMap[num].length + '× but not registered',
+              count: mentionMap[num].length
+            });
+            continue;
+          }
+
+          // Build representatives from doc mentions
+          var mentions = mentionMap[num];
+          if (mentions.length < 2) continue; // need at least 2 mentions to compare
+
+          var reps = _buildReps(mentions);
+          var repName = reps.displayName || el.name;
+          var issueCount = 0;
+
+          for (var mi = 0; mi < mentions.length; mi++) {
+            if (issueCount >= maxIssues) break;
+            var mention = mentions[mi];
+            var lvl = _classifyMent(mention, reps);
+            if (lvl === 'exact') continue;
+
+            var lvlLabel = lvl === 'conflict' ? 'CONFLICT' : lvl === 'article' ? 'ARTICLE' : 'REVIEW';
+            el.issues++;
+            issues.push({
+              type: lvl === 'conflict' ? 'conflict' : lvl === 'article' ? 'article' : 'review',
+              num: num,
+              desc: lvlLabel + ': "' + mention.nameUsed + '" vs rep "' + repName + '"',
+              count: 1
+            });
+            issueCount++;
+          }
+        }
+
+        // Orphan check
         elems.forEach(function(el) {
           if (el.refs === 0) {
             el.issues++;
@@ -728,11 +929,9 @@ function runInspection() {
 
         return ctx.sync();
       }).then(function() {
-        // Show results
         showInspectionResults(issues, totalMatches);
         save(); render();
         toast('Inspection done: ' + issues.length + ' issues');
-        switchTab('inspect', document.querySelectorAll('.tab')[1]);
       });
     });
   }).catch(function(e) { toast('Inspection error: ' + e.message); });
@@ -741,6 +940,18 @@ function runInspection() {
 function showInspectionResults(issues, matches) {
   var sum = document.getElementById('inspSummary');
   sum.style.display = 'grid';
+
+  // Count by category
+  var nConflict = 0, nArticle = 0, nReview = 0, nOld = 0, nOrphan = 0, nUnreg = 0;
+  issues.forEach(function(iss) {
+    if (iss.type === 'conflict') nConflict++;
+    else if (iss.type === 'article') nArticle++;
+    else if (iss.type === 'review') nReview++;
+    else if (iss.type === 'old') nOld++;
+    else if (iss.type === 'orphan') nOrphan++;
+    else if (iss.type === 'unregistered') nUnreg++;
+  });
+
   sum.innerHTML =
     '<div class="istat"><div class="n" style="color:var(--tx)">' + elems.length + '</div><div class="l">Elements</div></div>' +
     '<div class="istat"><div class="n" style="color:var(--green)">' + matches + '</div><div class="l">Matches</div></div>' +
@@ -755,11 +966,24 @@ function showInspectionResults(issues, matches) {
     list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--green);font-weight:600">All clean!</div>';
     return;
   }
+
+  // Issue type → CSS class + label
+  function issueStyle(type) {
+    switch(type) {
+      case 'conflict':     return { cls: 'con', label: '⚠ CONFLICT', color: '#ef4444' };
+      case 'article':      return { cls: 'art', label: '⚠ ARTICLE', color: '#e67e22' };
+      case 'review':       return { cls: 'rev', label: '△ REVIEW', color: '#f59e0b' };
+      case 'old':          return { cls: 'old', label: 'OLD NAME', color: '#ec4899' };
+      case 'orphan':       return { cls: 'orp', label: 'UNREFERENCED', color: '#6b7280' };
+      case 'unregistered': return { cls: 'unr', label: 'UNREGISTERED', color: '#8b5cf6' };
+      default:             return { cls: 'orp', label: 'ISSUE', color: '#6b7280' };
+    }
+  }
+
   list.innerHTML = issues.map(function(iss) {
-    var cls = iss.type === 'old' ? 'old' : iss.type === 'mismatch' ? 'mis' : 'orp';
-    var label = iss.type === 'old' ? 'OLD NAME' : iss.type === 'mismatch' ? 'MISMATCH' : 'UNREFERENCED';
+    var s = issueStyle(iss.type);
     return '<div class="issue-item" onclick="scrollToElement(\'' + iss.num + '\')">' +
-      '<div class="it ' + cls + '">' + label + '</div>' +
+      '<div class="it" style="background:' + s.color + '15;color:' + s.color + ';border-color:' + s.color + '30">' + s.label + '</div>' +
       '<div class="id"><strong>' + iss.num + '</strong> — ' + iss.desc + '</div></div>';
   }).join('');
 }
