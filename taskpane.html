@@ -119,7 +119,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.3.2</div>
+  <div class="ver">v0.1</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
@@ -141,18 +141,6 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
     <input class="name-input" placeholder="Element name..." id="addName">
     <button class="add-btn" onclick="addManual()">Add</button>
   </div>
-  <div style="padding:8px 10px;background:rgba(8,145,178,.06);border-bottom:1px solid rgba(8,145,178,.15)">
-    <div style="font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#0891b2;margin-bottom:4px">&#9889; Quick Insert &mdash; type $ + number</div>
-    <div style="display:flex;gap:4px;position:relative">
-      <input id="qiInput" placeholder="$50 = device 50" oninput="onQiInput()" onkeydown="onQiKey(event)" style="flex:1;padding:5px 8px;font-size:11px;border:1px solid var(--brd2);border-radius:4px;background:#fff;color:var(--tx);outline:none;font-family:monospace">
-      <button id="qiBtn" onclick="qiInsert()" disabled style="padding:5px 10px;background:#0891b2;color:#fff;border:none;border-radius:4px;font-size:9px;font-weight:600;cursor:pointer">Insert</button>
-      <div id="qiDropdown" style="display:none;position:absolute;top:100%;left:0;right:50px;background:#fff;border:1px solid var(--brd2);border-radius:4px;z-index:50;max-height:160px;overflow-y:auto;margin-top:2px"></div>
-    </div>
-    <div id="autoDetectBar" style="display:none;margin-top:6px;padding:6px 8px;background:#fff;border:1px solid #0891b2;border-radius:4px">
-      <div style="font-size:8px;font-weight:600;color:#0891b2;margin-bottom:4px">DETECTED IN DOCUMENT</div>
-      <div id="autoDetectList"></div>
-    </div>
-  </div>
   <div class="search-bar"><input placeholder="Search..." id="searchInput" oninput="render()"></div>
   <div class="filter-bar" id="filterBar">
     <button class="fbtn active" onclick="setF('all',this)">All <span class="cnt" id="fAll">0</span></button>
@@ -166,10 +154,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 
 <!-- INSPECT -->
 <div class="panel" id="p-inspect">
-  <div style="display:flex;gap:6px;padding:10px">
-    <button class="insp-btn" style="flex:1;margin:0" onclick="runInspection()">&#9654; Run Inspection</button>
-    <button class="insp-btn" style="flex:0 0 auto;margin:0;background:var(--bg3);color:var(--tx2);border:1px solid var(--brd);padding:10px 14px" onclick="clearHighlights()">&#10005; Clear</button>
-  </div>
+  <button class="insp-btn" onclick="runInspection()">&#9654; Run Inspection</button>
   <div class="insp-summary" id="inspSummary" style="display:none"></div>
   <div id="issueList"></div>
 </div>
@@ -184,7 +169,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
     </div>
     <div style="margin-top:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px">About</div>
-    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.3.2<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
+    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.1<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
   </div>
 </div>
 
@@ -202,8 +187,6 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 var elems = [];
 var selId = null, filter = 'all';
 var officeReady = false;
-var qiSelected = -1, qiMatches = [];
-var highlightedElemId = null;
 
 // Load from localStorage
 try {
@@ -241,8 +224,6 @@ function checkSelection() {
   Word.run(function(ctx) {
     var sel = ctx.document.getSelection();
     sel.load('text');
-    var para = sel.paragraphs.getFirstOrNullObject();
-    para.load('text');
     return ctx.sync().then(function() {
       var text = (sel.text || '').trim();
       var btn = document.getElementById('selBtn');
@@ -256,28 +237,6 @@ function checkSelection() {
         label.style.fontWeight = '400';
         btn.disabled = true;
       }
-      // Auto-detect $keyword patterns
-      var paraText = para.isNullObject ? '' : (para.text || '');
-      var dollarMatches = paraText.match(/\$[A-Za-z0-9]{1,20}/g);
-      var adBar = document.getElementById('autoDetectBar');
-      var adList = document.getElementById('autoDetectList');
-      if (dollarMatches && dollarMatches.length > 0 && elems.length > 0) {
-        var html = '', found = false;
-        for (var di = 0; di < dollarMatches.length; di++) {
-          var dMatch = dollarMatches[di];
-          var dQuery = dMatch.substring(1).toLowerCase();
-          var matched = elems.filter(function(e) { return e.num === dQuery || e.num.indexOf(dQuery) === 0 || e.name.indexOf(dQuery) === 0; }).slice(0, 5);
-          for (var mi = 0; mi < matched.length; mi++) {
-            var dElem = matched[mi]; found = true;
-            html += '<div style="display:flex;align-items:center;padding:3px 0;cursor:pointer;gap:6px" onclick="autoReplace(\'' + dMatch.replace(/'/g, "\\'") + '\',\'' + dElem.id + '\')">' +
-              '<span style="font-family:monospace;font-weight:700;color:#0891b2;min-width:40px">' + dMatch + '</span>' +
-              '<span style="font-size:10px;color:var(--tx);flex:1">' + dElem.name + ' ' + dElem.num + '</span>' +
-              '<span style="font-size:8px;padding:2px 6px;background:#0891b2;color:#fff;border-radius:3px">Replace</span></div>';
-          }
-        }
-        if (found) { adList.innerHTML = html; adBar.style.display = 'block'; }
-        else { adBar.style.display = 'none'; }
-      } else { adBar.style.display = 'none'; }
     });
   }).catch(function(){});
 }
@@ -311,140 +270,6 @@ function addFromSelection() {
       save(); render(); sel_elem('e'+num);
     });
   }).catch(function(e){ toast('Error: ' + e.message); });
-}
-
-// ============================================================
-// AUTO-REPLACE — $keyword in document → element name
-// ============================================================
-function autoReplace(searchPattern, elemId) {
-  if (!officeReady) return;
-  var el = elems.find(function(e) { return e.id === elemId; });
-  if (!el || !el.name) return;
-  var replaceText = el.name + ' ' + el.num;
-  Word.run(function(ctx) {
-    var results = ctx.document.body.search(searchPattern, { matchCase: false, matchWholeWord: false });
-    results.load('items');
-    return ctx.sync().then(function() {
-      if (results.items.length > 0) results.items[0].insertText(replaceText, 'Replace');
-      return ctx.sync();
-    }).then(function() {
-      toast('Replaced: ' + searchPattern + ' → ' + replaceText);
-      document.getElementById('autoDetectBar').style.display = 'none';
-    });
-  }).catch(function(e) { toast('Replace error: ' + e.message); });
-}
-
-// ============================================================
-// QUICK INSERT
-// ============================================================
-function onQiInput() {
-  var val = document.getElementById('qiInput').value.trim();
-  var dd = document.getElementById('qiDropdown');
-  var btn = document.getElementById('qiBtn');
-  if (val.charAt(0) !== '$') { dd.style.display = 'none'; btn.disabled = true; qiMatches = []; return; }
-  var q = val.substring(1).toLowerCase();
-  if (!q) { dd.style.display = 'none'; btn.disabled = true; qiMatches = []; return; }
-  qiMatches = elems.filter(function(e) { return e.num.indexOf(q) === 0 || e.name.indexOf(q) >= 0; }).slice(0, 8);
-  if (qiMatches.length === 0) { dd.style.display = 'none'; btn.disabled = true; return; }
-  qiSelected = 0; renderQiDd(); dd.style.display = 'block'; btn.disabled = false;
-}
-function renderQiDd() {
-  var dd = document.getElementById('qiDropdown');
-  dd.innerHTML = qiMatches.map(function(e, i) {
-    return '<div style="padding:5px 8px;cursor:pointer;display:flex;align-items:center;font-size:10px;border-bottom:1px solid var(--bg3);' + (i === qiSelected ? 'background:rgba(8,145,178,.06)' : '') + '" onclick="qiPick(' + i + ')">' +
-      '<span style="font-family:monospace;font-weight:700;color:#0891b2;min-width:28px;margin-right:6px">' + e.num + '</span><span>' + e.name + '</span></div>';
-  }).join('');
-}
-function onQiKey(ev) {
-  var dd = document.getElementById('qiDropdown');
-  if (dd.style.display === 'none' || qiMatches.length === 0) return;
-  if (ev.keyCode === 40) { ev.preventDefault(); qiSelected = Math.min(qiSelected + 1, qiMatches.length - 1); renderQiDd(); }
-  else if (ev.keyCode === 38) { ev.preventDefault(); qiSelected = Math.max(qiSelected - 1, 0); renderQiDd(); }
-  else if (ev.keyCode === 13) { ev.preventDefault(); qiPick(qiSelected); }
-  else if (ev.keyCode === 27) { dd.style.display = 'none'; }
-}
-function qiPick(idx) {
-  if (idx < 0 || idx >= qiMatches.length) return;
-  var e = qiMatches[idx];
-  document.getElementById('qiInput').value = e.name + ' ' + e.num;
-  document.getElementById('qiDropdown').style.display = 'none';
-  document.getElementById('qiBtn').disabled = false;
-}
-function qiInsert() {
-  var inp = document.getElementById('qiInput');
-  var text = inp.value.trim();
-  if (!text || text.charAt(0) === '$') {
-    if (qiMatches.length > 0) { var e = qiMatches[qiSelected >= 0 ? qiSelected : 0]; text = e.name + ' ' + e.num; }
-    else return;
-  }
-  if (!officeReady) { toast('Not connected to Word'); return; }
-  Word.run(function(ctx) {
-    ctx.document.getSelection().insertText(text, 'Replace');
-    return ctx.sync().then(function() {
-      toast('Inserted: ' + text);
-      inp.value = '';
-      document.getElementById('qiDropdown').style.display = 'none';
-      document.getElementById('qiBtn').disabled = true;
-    });
-  }).catch(function(e) { toast('Insert error: ' + e.message); });
-}
-
-// ============================================================
-// ELEMENT CLICK HIGHLIGHT
-// ============================================================
-function highlightElement(elemId) {
-  if (!officeReady) return;
-  var el = elems.find(function(e) { return e.id === elemId; });
-  if (!el || !el.name || !el.num) return;
-
-  if (highlightedElemId === elemId) {
-    clearElementHighlight(function() { highlightedElemId = null; }); return;
-  }
-
-  var doHL = function() {
-    highlightedElemId = elemId;
-    var counts = { official: 0, variant: 0, oldname: 0 };
-    Word.run(function(ctx) {
-      var body = ctx.document.body;
-      body.load('text');
-      return ctx.sync().then(function() {
-        var searches = [];
-        var off = body.search(el.name + ' ' + el.num, { matchCase: false, matchWholeWord: false });
-        off.load('items'); searches.push({ type: 'official', results: off });
-        el.variants.forEach(function(v) { if (!v) return; var vr = body.search(v + ' ' + el.num, { matchCase: false, matchWholeWord: false }); vr.load('items'); searches.push({ type: 'variant', results: vr }); });
-        el.oldNames.forEach(function(o) { if (!o) return; var or2 = body.search(o + ' ' + el.num, { matchCase: false, matchWholeWord: false }); or2.load('items'); searches.push({ type: 'oldname', results: or2 }); });
-        return ctx.sync().then(function() {
-          searches.forEach(function(s) {
-            if (s.type === 'official') { counts.official = s.results.items.length; s.results.items.forEach(function(r) { r.font.highlightColor = 'BrightGreen'; }); }
-            else if (s.type === 'variant') { counts.variant += s.results.items.length; s.results.items.forEach(function(r) { r.font.highlightColor = 'Yellow'; }); }
-            else if (s.type === 'oldname') { counts.oldname += s.results.items.length; s.results.items.forEach(function(r) { r.font.highlightColor = 'Pink'; }); }
-          });
-          return ctx.sync();
-        }).then(function() {
-          toast('#' + el.num + ': ' + (counts.official + counts.variant + counts.oldname) + ' matches');
-        });
-      });
-    }).catch(function(e) { toast('Highlight error: ' + e.message); });
-  };
-
-  if (highlightedElemId) { clearElementHighlight(doHL); } else { doHL(); }
-}
-
-function clearElementHighlight(callback) {
-  if (!officeReady || !highlightedElemId) { if (callback) callback(); return; }
-  var el = elems.find(function(e) { return e.id === highlightedElemId; });
-  if (!el) { highlightedElemId = null; if (callback) callback(); return; }
-  Word.run(function(ctx) {
-    var body = ctx.document.body;
-    var all = [];
-    if (el.name) { var r1 = body.search(el.name + ' ' + el.num, { matchCase: false }); r1.load('items'); all.push(r1); }
-    el.variants.forEach(function(v) { if (!v) return; var rv = body.search(v + ' ' + el.num, { matchCase: false }); rv.load('items'); all.push(rv); });
-    el.oldNames.forEach(function(o) { if (!o) return; var ro = body.search(o + ' ' + el.num, { matchCase: false }); ro.load('items'); all.push(ro); });
-    return ctx.sync().then(function() {
-      all.forEach(function(r) { r.items.forEach(function(item) { item.font.highlightColor = 'NoHighlight'; }); });
-      return ctx.sync();
-    }).then(function() { highlightedElemId = null; if (callback) callback(); });
-  }).catch(function() { highlightedElemId = null; if (callback) callback(); });
 }
 
 // ============================================================
@@ -499,7 +324,7 @@ function runInspection() {
             p.elem.refs += count;
             totalMatches += count;
             // Green highlight
-            p.results.items.forEach(function(r) { r.font.highlightColor = 'BrightGreen'; });
+            p.results.items.forEach(function(r) { r.font.highlightColor = 'Green'; });
           } else if (p.type === 'variant') {
             p.elem.refs += count;
             totalMatches += count;
@@ -575,30 +400,36 @@ function showInspectionResults(issues, matches) {
 function clearHighlights() {
   if (!officeReady) return;
   Word.run(function(ctx) {
+    // Search for any highlighted text and remove highlighting
     var body = ctx.document.body;
-    var allSearches = [];
-
-    elems.forEach(function(el) {
-      if (!el.name || !el.num) return;
-      var patterns = [el.name + ' ' + el.num];
-      el.variants.forEach(function(v) { if (v) patterns.push(v + ' ' + el.num); });
-      el.oldNames.forEach(function(o) { if (o) patterns.push(o + ' ' + el.num); });
-      patterns.forEach(function(p) {
-        var r = body.search(p, { matchCase: false });
-        r.load('items');
-        allSearches.push(r);
+    ['Green','Yellow','Pink'].forEach(function(color) {
+      // We can't easily search by highlight, so we search known patterns
+      elems.forEach(function(el) {
+        var patterns = [el.name + ' ' + el.num];
+        el.variants.forEach(function(v) { patterns.push(v + ' ' + el.num); });
+        el.oldNames.forEach(function(o) { patterns.push(o + ' ' + el.num); });
+        patterns.forEach(function(p) {
+          var r = body.search(p, { matchCase: false });
+          r.load('items');
+        });
       });
     });
-
     return ctx.sync().then(function() {
-      allSearches.forEach(function(r) {
-        r.items.forEach(function(item) { item.font.highlightColor = 'NoHighlight'; });
+      // Remove all highlights by setting to NoHighlight
+      elems.forEach(function(el) {
+        var patterns = [el.name + ' ' + el.num];
+        el.variants.forEach(function(v) { patterns.push(v + ' ' + el.num); });
+        el.oldNames.forEach(function(o) { patterns.push(o + ' ' + el.num); });
+        patterns.forEach(function(p) {
+          var r = body.search(p, { matchCase: false });
+          r.load('items');
+        });
       });
       return ctx.sync();
     }).then(function() {
       toast('Highlights cleared');
     });
-  }).catch(function(e) { toast('Clear error: ' + e.message); });
+  }).catch(function(){});
 }
 
 function scrollToElement(num) {
@@ -674,11 +505,7 @@ function sel_elem(id) {
   var e = elems.find(function(x) { return x.id === id; });
   if (!e) return;
   var inner = document.getElementById('detailInner');
-  var h = '<div class="dh"><div class="dh-num">' + e.num + '</div><div style="display:flex;gap:4px">';
-  h += '<button class="dh-close" onclick="highlightElement(\'' + e.id + '\')" title="Highlight in document" style="color:var(--acc);font-weight:700">&#9632;</button>';
-  h += '<button class="dh-close" onclick="scrollToElement(\'' + e.num + '\')" title="Go to document">&gt;</button>';
-  h += '<button class="dh-close" onclick="closeDetail()">x</button>';
-  h += '</div></div>';
+  var h = '<div class="dh"><div class="dh-num">' + e.num + '</div><button class="dh-close" onclick="closeDetail()">x</button></div>';
   h += '<div class="fg"><div class="fl">Official Name</div><div style="display:flex;gap:4px"><input class="fi" id="dName" value="' + e.name + '" style="flex:1"><button class="add-btn" style="padding:3px 7px;font-size:8px" onclick="saveName(\'' + e.id + '\')">Save</button></div></div>';
   h += '<div class="fg"><div class="fl">Variants</div><input class="fi" id="dVariants" value="' + e.variants.join(', ') + '" placeholder="comma-separated..."><div class="fh">OK forms</div></div>';
   h += '<div class="fg"><div class="fl">Old Names</div>';
@@ -691,7 +518,6 @@ function sel_elem(id) {
 }
 
 function closeDetail() {
-  if (highlightedElemId) { clearElementHighlight(null); }
   document.getElementById('detailPanel').classList.remove('open');
   selId = null;
   render();
