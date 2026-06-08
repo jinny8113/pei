@@ -620,11 +620,11 @@ function highlightElement(elemId) {
     highlightedElemId = elemId;
     var counts = { official: 0, variant: 0, oldname: 0, mismatch: 0 };
 
+    // PHASE 1: Highlight official, variants, old names
     Word.run(function(ctx) {
       var body = ctx.document.body;
       var searches = [];
 
-      // 1. Official name search
       var officialPattern = (el.name || '').trim() + ' ' + el.num;
       if (el.name && el.name.trim()) {
         var offResults = body.search(officialPattern, { matchCase: false, matchWholeWord: false });
@@ -632,7 +632,6 @@ function highlightElement(elemId) {
         searches.push({ type: 'official', results: offResults });
       }
 
-      // 2. Variant searches
       el.variants.forEach(function(v) {
         if (!v || !v.trim()) return;
         var vResults = body.search(v.trim() + ' ' + el.num, { matchCase: false, matchWholeWord: false });
@@ -640,7 +639,6 @@ function highlightElement(elemId) {
         searches.push({ type: 'variant', results: vResults });
       });
 
-      // 3. Old name searches
       el.oldNames.forEach(function(old) {
         if (!old || !old.trim()) return;
         var oResults = body.search(old.trim() + ' ' + el.num, { matchCase: false, matchWholeWord: false });
@@ -649,12 +647,6 @@ function highlightElement(elemId) {
       });
 
       return ctx.sync().then(function() {
-        // Collect known name patterns for mismatch detection
-        var knownPatterns = [];
-        if (el.name && el.name.trim()) knownPatterns.push(el.name.trim().toLowerCase());
-        el.variants.forEach(function(v) { if (v && v.trim()) knownPatterns.push(v.trim().toLowerCase()); });
-        el.oldNames.forEach(function(o) { if (o && o.trim()) knownPatterns.push(o.trim().toLowerCase()); });
-
         searches.forEach(function(s) {
           var items = s.results.items;
           if (s.type === 'official') {
@@ -668,22 +660,32 @@ function highlightElement(elemId) {
             items.forEach(function(r) { r.font.highlightColor = 'Pink'; });
           }
         });
+        return ctx.sync();
+      });
+    }).then(function() {
+      // PHASE 2: Mismatch detection in separate Word.run
+      // Even if this fails, Phase 1 highlights are already applied
+      Word.run(function(ctx2) {
+        var body2 = ctx2.document.body;
 
-        // 4. Mismatch detection: search for bare number, check surrounding text
-        var numResults = body.search(el.num, { matchCase: false, matchWholeWord: true });
+        var knownPatterns = [];
+        if (el.name && el.name.trim()) knownPatterns.push(el.name.trim().toLowerCase());
+        el.variants.forEach(function(v) { if (v && v.trim()) knownPatterns.push(v.trim().toLowerCase()); });
+        el.oldNames.forEach(function(o) { if (o && o.trim()) knownPatterns.push(o.trim().toLowerCase()); });
+
+        var numResults = body2.search(el.num, { matchCase: false, matchWholeWord: true });
         numResults.load('items');
-        return ctx.sync().then(function() {
-          // For each number match, expand range to get context
-          var expandPromises = [];
+
+        return ctx2.sync().then(function() {
+          var expandItems = [];
           numResults.items.forEach(function(item) {
             var expanded = item.getRange('Whole');
             expanded.load('text');
-            expandPromises.push({ range: item, expanded: expanded });
+            expandItems.push({ range: item, expanded: expanded });
           });
-          return ctx.sync().then(function() {
-            expandPromises.forEach(function(ep) {
+          return ctx2.sync().then(function() {
+            expandItems.forEach(function(ep) {
               var lineText = (ep.expanded.text || '').toLowerCase().trim();
-              // Check if this number occurrence is part of any known pattern
               var isKnown = false;
               for (var ki = 0; ki < knownPatterns.length; ki++) {
                 if (lineText.indexOf(knownPatterns[ki] + ' ' + el.num) >= 0) {
@@ -703,13 +705,18 @@ function highlightElement(elemId) {
                 }
               }
             });
-            return ctx.sync();
+            return ctx2.sync();
           });
         });
       }).then(function() {
         updateHighlightLegend(counts);
         var total = counts.official + counts.variant + counts.oldname + counts.mismatch;
         toast('#' + el.num + ': ' + total + ' matches found');
+      }).catch(function() {
+        // Mismatch detection failed, but Phase 1 is fine
+        updateHighlightLegend(counts);
+        var total = counts.official + counts.variant + counts.oldname;
+        toast('#' + el.num + ': ' + total + ' matches (mismatch scan skipped)');
       });
     }).catch(function(e) {
       toast('Highlight error: ' + e.message);
