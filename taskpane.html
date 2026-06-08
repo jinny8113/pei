@@ -211,7 +211,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.9.0</div>
+  <div class="ver">v0.9.1</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
@@ -296,7 +296,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
     <div id="ecConfigPanel"></div>
 
     <div style="margin-top:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px">About</div>
-    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.9.0<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
+    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.9.1<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
   </div>
 </div>
 
@@ -910,7 +910,7 @@ function runInspection() {
 
             var lvlLabel = lvl === 'conflict' ? 'CONFLICT' : lvl === 'article' ? 'ARTICLE' : 'REVIEW';
             var searchTxt = mention.nameUsed + ' ' + num;
-            var hlColor = lvl === 'conflict' ? 'Red' : lvl === 'article' ? 'Turquoise' : 'Blue';
+            var hlColor = lvl === 'conflict' ? 'Red' : lvl === 'article' ? 'Turquoise' : 'Gray';
             conflictHighlights.push({ text: searchTxt, color: hlColor });
 
             el.issues++;
@@ -1047,13 +1047,30 @@ function clearHighlights() {
 
     return ctx.sync().then(function() {
       allSearches.forEach(function(r) {
-        r.items.forEach(function(item) { item.font.highlightColor = null; });
+        r.items.forEach(function(item) { item.font.highlightColor = null; item.font.underline = 'None'; });
       });
       return ctx.sync();
     }).then(function() {
+      _lastScrollMarked = null;
       toast('Highlights cleared');
     });
   }).catch(function(e) { toast('Clear error: ' + e.message); });
+}
+
+var _lastScrollMarked = null; // { text } — track last scroll-marked item
+
+function _clearScrollMark(ctx) {
+  if (!_lastScrollMarked) return;
+  var prev = ctx.document.body.search(_lastScrollMarked.text, { matchCase: false });
+  prev.load('items');
+  return ctx.sync().then(function() {
+    prev.items.forEach(function(item) {
+      item.font.underline = 'None';
+      item.font.color = null; // reset to default
+    });
+    _lastScrollMarked = null;
+    return ctx.sync();
+  });
 }
 
 function scrollToElement(num, searchText) {
@@ -1064,17 +1081,38 @@ function scrollToElement(num, searchText) {
   } else {
     var el = elems.find(function(e) { return e.num === num; });
     if (el) pattern = el.name + ' ' + num;
-    else pattern = num; // fallback: just the number
+    else pattern = num;
   }
   if (!pattern) return;
   Word.run(function(ctx) {
-    var results = ctx.document.body.search(pattern, { matchCase: false });
-    results.load('items');
-    return ctx.sync().then(function() {
-      if (results.items.length > 0) {
-        results.items[0].select();
-      }
-      return ctx.sync();
+    // Clear previous scroll mark first
+    var clearPromise;
+    if (_lastScrollMarked) {
+      var prev = ctx.document.body.search(_lastScrollMarked.text, { matchCase: false });
+      prev.load('items');
+      clearPromise = ctx.sync().then(function() {
+        prev.items.forEach(function(item) {
+          item.font.underline = 'None';
+        });
+        return ctx.sync();
+      });
+    } else {
+      clearPromise = ctx.sync();
+    }
+
+    return clearPromise.then(function() {
+      var results = ctx.document.body.search(pattern, { matchCase: false });
+      results.load('items');
+      return ctx.sync().then(function() {
+        if (results.items.length > 0) {
+          // Select (scroll to) first match
+          results.items[0].select();
+          // Apply red wavy underline to mark it
+          results.items[0].font.underline = 'DashLongHeavy';
+        }
+        _lastScrollMarked = { text: pattern };
+        return ctx.sync();
+      });
     });
   }).catch(function(){});
 }
