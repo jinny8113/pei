@@ -119,7 +119,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.3.3</div>
+  <div class="ver">v0.3.4</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
@@ -184,7 +184,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
     </div>
     <div style="margin-top:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px">About</div>
-    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.3.3<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
+    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.3.4<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
   </div>
 </div>
 
@@ -441,7 +441,7 @@ function clearElementHighlight(callback) {
     el.variants.forEach(function(v) { if (!v) return; var rv = body.search(v + ' ' + el.num, { matchCase: false }); rv.load('items'); all.push(rv); });
     el.oldNames.forEach(function(o) { if (!o) return; var ro = body.search(o + ' ' + el.num, { matchCase: false }); ro.load('items'); all.push(ro); });
     return ctx.sync().then(function() {
-      all.forEach(function(r) { r.items.forEach(function(item) { item.font.highlightColor = 'NoHighlight'; }); });
+      all.forEach(function(r) { r.items.forEach(function(item) { item.font.highlightColor = null; }); });
       return ctx.sync();
     }).then(function() { highlightedElemId = null; if (callback) callback(); });
   }).catch(function() { highlightedElemId = null; if (callback) callback(); });
@@ -592,7 +592,7 @@ function clearHighlights() {
 
     return ctx.sync().then(function() {
       allSearches.forEach(function(r) {
-        r.items.forEach(function(item) { item.font.highlightColor = 'NoHighlight'; });
+        r.items.forEach(function(item) { item.font.highlightColor = null; });
       });
       return ctx.sync();
     }).then(function() {
