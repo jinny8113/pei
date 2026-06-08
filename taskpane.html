@@ -211,7 +211,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.8.0</div>
+  <div class="ver">v0.9.0</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
@@ -296,7 +296,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
     <div id="ecConfigPanel"></div>
 
     <div style="margin-top:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px">About</div>
-    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.8.0<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
+    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.9.0<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
   </div>
 </div>
 
@@ -853,7 +853,8 @@ function runInspection() {
                 type: 'old',
                 num: p.elem.num,
                 desc: '"' + p.oldName + '" should be "' + p.elem.name + '"',
-                count: count
+                count: count,
+                searchText: p.oldName + ' ' + p.elem.num
               });
             }
           }
@@ -866,6 +867,10 @@ function runInspection() {
         // Build element lookup by number
         var elemByNum = {};
         elems.forEach(function(el) { elemByNum[el.num] = el; });
+
+        // Collect conflict mentions for highlighting
+        // color map: conflict → Red, article → Turquoise, review → Blue
+        var conflictHighlights = []; // { text, color }
 
         // For each registered element, check name consistency
         for (var num in mentionMap) {
@@ -883,14 +888,15 @@ function runInspection() {
               type: 'unregistered',
               num: num,
               desc: '"' + topName + ' ' + num + '" found ' + mentionMap[num].length + '× but not registered',
-              count: mentionMap[num].length
+              count: mentionMap[num].length,
+              searchText: topName + ' ' + num
             });
             continue;
           }
 
           // Build representatives from doc mentions
           var mentions = mentionMap[num];
-          if (mentions.length < 2) continue; // need at least 2 mentions to compare
+          if (mentions.length < 2) continue;
 
           var reps = _buildReps(mentions);
           var repName = reps.displayName || el.name;
@@ -903,12 +909,17 @@ function runInspection() {
             if (lvl === 'exact') continue;
 
             var lvlLabel = lvl === 'conflict' ? 'CONFLICT' : lvl === 'article' ? 'ARTICLE' : 'REVIEW';
+            var searchTxt = mention.nameUsed + ' ' + num;
+            var hlColor = lvl === 'conflict' ? 'Red' : lvl === 'article' ? 'Turquoise' : 'Blue';
+            conflictHighlights.push({ text: searchTxt, color: hlColor });
+
             el.issues++;
             issues.push({
               type: lvl === 'conflict' ? 'conflict' : lvl === 'article' ? 'article' : 'review',
               num: num,
               desc: lvlLabel + ': "' + mention.nameUsed + '" vs rep "' + repName + '"',
-              count: 1
+              count: 1,
+              searchText: searchTxt
             });
             issueCount++;
           }
@@ -922,12 +933,29 @@ function runInspection() {
               type: 'orphan',
               num: el.num,
               desc: '"' + el.name + '" not found in document',
-              count: 0
+              count: 0,
+              searchText: ''
             });
           }
         });
 
-        return ctx.sync();
+        // --- Phase 3: Highlight conflict mentions ---
+        var hlSearches = [];
+        for (var hi = 0; hi < conflictHighlights.length; hi++) {
+          var ch = conflictHighlights[hi];
+          var chResults = body.search(ch.text, { matchCase: false, matchWholeWord: false });
+          chResults.load('items');
+          hlSearches.push({ results: chResults, color: ch.color });
+        }
+
+        return ctx.sync().then(function() {
+          for (var hi2 = 0; hi2 < hlSearches.length; hi2++) {
+            hlSearches[hi2].results.items.forEach(function(r) {
+              r.font.highlightColor = hlSearches[hi2].color;
+            });
+          }
+          return ctx.sync();
+        });
       }).then(function() {
         showInspectionResults(issues, totalMatches);
         save(); render();
@@ -982,7 +1010,9 @@ function showInspectionResults(issues, matches) {
 
   list.innerHTML = issues.map(function(iss) {
     var s = issueStyle(iss.type);
-    return '<div class="issue-item" onclick="scrollToElement(\'' + iss.num + '\')">' +
+    var escapedSearch = (iss.searchText || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    var onclickFn = escapedSearch ? "scrollToElement('" + iss.num + "','" + escapedSearch + "')" : "scrollToElement('" + iss.num + "')";
+    return '<div class="issue-item" onclick="' + onclickFn + '">' +
       '<div class="it" style="background:' + s.color + '15;color:' + s.color + ';border-color:' + s.color + '30">' + s.label + '</div>' +
       '<div class="id"><strong>' + iss.num + '</strong> — ' + iss.desc + '</div></div>';
   }).join('');
@@ -992,6 +1022,9 @@ function clearHighlights() {
   if (!officeReady) return;
   Word.run(function(ctx) {
     var body = ctx.document.body;
+
+    // Clear ALL highlights by searching for known highlight colors
+    // Office.js doesn't have a "clear all highlights" API, so we search all registered patterns + conflict patterns
     var allSearches = [];
 
     elems.forEach(function(el) {
@@ -1006,6 +1039,12 @@ function clearHighlights() {
       });
     });
 
+    // Also search with a broad pattern to catch conflict highlights
+    // Use "number" pattern to find any "word(s) + 2-4 digit number" — covers all elements
+    var broadPat = body.search('[0-9][0-9]', { matchCase: false, matchWholeWord: false, matchWildcards: false });
+    broadPat.load('items');
+    allSearches.push(broadPat);
+
     return ctx.sync().then(function() {
       allSearches.forEach(function(r) {
         r.items.forEach(function(item) { item.font.highlightColor = null; });
@@ -1017,12 +1056,19 @@ function clearHighlights() {
   }).catch(function(e) { toast('Clear error: ' + e.message); });
 }
 
-function scrollToElement(num) {
+function scrollToElement(num, searchText) {
   if (!officeReady) return;
-  var el = elems.find(function(e) { return e.num === num; });
-  if (!el) return;
+  var pattern = '';
+  if (searchText) {
+    pattern = searchText;
+  } else {
+    var el = elems.find(function(e) { return e.num === num; });
+    if (el) pattern = el.name + ' ' + num;
+    else pattern = num; // fallback: just the number
+  }
+  if (!pattern) return;
   Word.run(function(ctx) {
-    var results = ctx.document.body.search(el.name + ' ' + num, { matchCase: false });
+    var results = ctx.document.body.search(pattern, { matchCase: false });
     results.load('items');
     return ctx.sync().then(function() {
       if (results.items.length > 0) {
