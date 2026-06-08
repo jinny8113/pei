@@ -112,7 +112,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:#f7f8fa;color:#1
 .d-fig{margin-top:4px}
 .d-fig-tag{display:inline-block;padding:2px 7px;border-radius:3px;font-size:8px;font-weight:500;background:rgba(8,145,178,.06);color:#0891b2;border:1px solid rgba(8,145,178,.15);margin:2px 2px 0 0}
 
-/* Highlight legend (element detail) */
+/* Highlight legend */
 .hl-legend{margin-top:6px;padding:6px 8px;background:#f7f8fa;border-radius:4px;border:1px solid #e2e5ea}
 .hl-legend-title{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#5c6370;margin-bottom:3px}
 .hl-legend-row{display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;padding:2px 0;font-size:9px;color:#5c6370}
@@ -201,7 +201,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:#f7f8fa;color:#1
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.3.1</div>
+  <div class="ver">v0.3.2</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
@@ -294,7 +294,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:#f7f8fa;color:#1
     <div class="cfg-sep"></div>
     <div class="cfg-title">About</div>
     <div class="cfg-about">
-      Patent Element Inspector v0.3.1<br>
+      Patent Element Inspector v0.3.2<br>
       Office Add-in for Word<br>
       Compatible with Office 2019 &amp; 365<br>
       <span style="color:#9099a6">github.com/jinny8113/pei</span>
@@ -361,7 +361,7 @@ var officeReady = false;
 var qiSelected = -1;
 var qiMatches = [];
 var activeFigure = null;
-var highlightedElemId = null; // track which element has active highlight
+var highlightedElemId = null;
 
 // Load from localStorage
 try {
@@ -398,7 +398,6 @@ function checkSelection() {
   Word.run(function(ctx) {
     var sel = ctx.document.getSelection();
     sel.load('text');
-    // Also load the paragraph containing the cursor
     var para = sel.paragraphs.getFirstOrNullObject();
     para.load('text');
     return ctx.sync().then(function() {
@@ -416,7 +415,7 @@ function checkSelection() {
         btn.disabled = true;
       }
 
-      // Auto-detect $keyword patterns in current paragraph (number or text)
+      // Auto-detect $keyword patterns in current paragraph
       var paraText = para.isNullObject ? '' : (para.text || '');
       var dollarMatches = paraText.match(/\$[A-Za-z0-9]{1,20}/g);
       var adBar = document.getElementById('autoDetectBar');
@@ -427,8 +426,7 @@ function checkSelection() {
         var found = false;
         for (var di = 0; di < dollarMatches.length; di++) {
           var dMatch = dollarMatches[di];
-          var dQuery = dMatch.substring(1).toLowerCase(); // remove $
-          // Match by number OR by name (startsWith or contains)
+          var dQuery = dMatch.substring(1).toLowerCase();
           var matchedElems = elems.filter(function(e) {
             return e.num === dQuery || e.num.indexOf(dQuery) === 0 || e.name.indexOf(dQuery) === 0;
           }).slice(0, 5);
@@ -452,29 +450,6 @@ function checkSelection() {
       }
     });
   }).catch(function(){});
-}
-
-// Auto-replace: find $keyword in document and replace with element name + number
-function autoReplace(searchPattern, elemId) {
-  if (!officeReady) return;
-  var el = elems.find(function(e) { return e.id === elemId; });
-  if (!el || !el.name) return;
-  var replaceText = el.name + ' ' + el.num;
-
-  Word.run(function(ctx) {
-    var results = ctx.document.body.search(searchPattern, { matchCase: false, matchWholeWord: false });
-    results.load('items');
-    return ctx.sync().then(function() {
-      if (results.items.length > 0) {
-        // Replace the first occurrence
-        results.items[0].insertText(replaceText, 'Replace');
-      }
-      return ctx.sync();
-    }).then(function() {
-      toast('Replaced: ' + searchPattern + ' > ' + replaceText);
-      document.getElementById('autoDetectBar').style.display = 'none';
-    });
-  }).catch(function(e) { toast('Replace error: ' + e.message); });
 }
 
 function addFromSelection() {
@@ -506,6 +481,28 @@ function addFromSelection() {
       save(); render(); sel_elem('e'+num);
     });
   }).catch(function(e){ toast('Error: ' + e.message); });
+}
+
+// Auto-replace: find $keyword in document and replace with element name + number
+function autoReplace(searchPattern, elemId) {
+  if (!officeReady) return;
+  var el = elems.find(function(e) { return e.id === elemId; });
+  if (!el || !el.name) return;
+  var replaceText = el.name + ' ' + el.num;
+
+  Word.run(function(ctx) {
+    var results = ctx.document.body.search(searchPattern, { matchCase: false, matchWholeWord: false });
+    results.load('items');
+    return ctx.sync().then(function() {
+      if (results.items.length > 0) {
+        results.items[0].insertText(replaceText, 'Replace');
+      }
+      return ctx.sync();
+    }).then(function() {
+      toast('Replaced: ' + searchPattern + ' > ' + replaceText);
+      document.getElementById('autoDetectBar').style.display = 'none';
+    });
+  }).catch(function(e) { toast('Replace error: ' + e.message); });
 }
 
 // ============================================================
@@ -604,123 +601,63 @@ function qiInsert() {
 function highlightElement(elemId) {
   if (!officeReady) return;
   var el = elems.find(function(e) { return e.id === elemId; });
-  if (!el) return;
+  if (!el || !el.name || !el.num) return;
 
-  // If same element clicked again, just clear
+  // Toggle off if same element
   if (highlightedElemId === elemId) {
     clearElementHighlight(function() {
       highlightedElemId = null;
-      updateHighlightLegend(null);
+      updateHlLegend(null);
     });
     return;
   }
 
-  // Clear previous highlight first, then apply new
   var doHighlight = function() {
     highlightedElemId = elemId;
-    var counts = { official: 0, variant: 0, oldname: 0, mismatch: 0 };
+    var counts = { official: 0, variant: 0, oldname: 0 };
 
-    // PHASE 1: Highlight official, variants, old names
     Word.run(function(ctx) {
       var body = ctx.document.body;
       var searches = [];
 
-      var officialPattern = (el.name || '').trim() + ' ' + el.num;
-      if (el.name && el.name.trim()) {
-        var offResults = body.search(officialPattern, { matchCase: false, matchWholeWord: false });
-        offResults.load('items');
-        searches.push({ type: 'official', results: offResults });
-      }
+      var offResults = body.search(el.name + ' ' + el.num, { matchCase: false, matchWholeWord: false });
+      offResults.load('items');
+      searches.push({ type: 'official', results: offResults });
 
       el.variants.forEach(function(v) {
-        if (!v || !v.trim()) return;
-        var vResults = body.search(v.trim() + ' ' + el.num, { matchCase: false, matchWholeWord: false });
-        vResults.load('items');
-        searches.push({ type: 'variant', results: vResults });
+        if (!v) return;
+        var vr = body.search(v + ' ' + el.num, { matchCase: false, matchWholeWord: false });
+        vr.load('items');
+        searches.push({ type: 'variant', results: vr });
       });
 
       el.oldNames.forEach(function(old) {
-        if (!old || !old.trim()) return;
-        var oResults = body.search(old.trim() + ' ' + el.num, { matchCase: false, matchWholeWord: false });
-        oResults.load('items');
-        searches.push({ type: 'oldname', results: oResults });
+        if (!old) return;
+        var or2 = body.search(old + ' ' + el.num, { matchCase: false, matchWholeWord: false });
+        or2.load('items');
+        searches.push({ type: 'oldname', results: or2 });
       });
 
       return ctx.sync().then(function() {
         searches.forEach(function(s) {
-          var items = s.results.items;
           if (s.type === 'official') {
-            counts.official = items.length;
-            items.forEach(function(r) { r.font.highlightColor = 'BrightGreen'; });
+            counts.official = s.results.items.length;
+            s.results.items.forEach(function(r) { r.font.highlightColor = 'BrightGreen'; });
           } else if (s.type === 'variant') {
-            counts.variant += items.length;
-            items.forEach(function(r) { r.font.highlightColor = 'Yellow'; });
+            counts.variant += s.results.items.length;
+            s.results.items.forEach(function(r) { r.font.highlightColor = 'Yellow'; });
           } else if (s.type === 'oldname') {
-            counts.oldname += items.length;
-            items.forEach(function(r) { r.font.highlightColor = 'Pink'; });
+            counts.oldname += s.results.items.length;
+            s.results.items.forEach(function(r) { r.font.highlightColor = 'Pink'; });
           }
         });
         return ctx.sync();
-      });
-    }).then(function() {
-      // PHASE 2: Mismatch detection in separate Word.run
-      // Even if this fails, Phase 1 highlights are already applied
-      Word.run(function(ctx2) {
-        var body2 = ctx2.document.body;
-
-        var knownPatterns = [];
-        if (el.name && el.name.trim()) knownPatterns.push(el.name.trim().toLowerCase());
-        el.variants.forEach(function(v) { if (v && v.trim()) knownPatterns.push(v.trim().toLowerCase()); });
-        el.oldNames.forEach(function(o) { if (o && o.trim()) knownPatterns.push(o.trim().toLowerCase()); });
-
-        var numResults = body2.search(el.num, { matchCase: false, matchWholeWord: true });
-        numResults.load('items');
-
-        return ctx2.sync().then(function() {
-          var expandItems = [];
-          numResults.items.forEach(function(item) {
-            var expanded = item.getRange('Whole');
-            expanded.load('text');
-            expandItems.push({ range: item, expanded: expanded });
-          });
-          return ctx2.sync().then(function() {
-            expandItems.forEach(function(ep) {
-              var lineText = (ep.expanded.text || '').toLowerCase().trim();
-              var isKnown = false;
-              for (var ki = 0; ki < knownPatterns.length; ki++) {
-                if (lineText.indexOf(knownPatterns[ki] + ' ' + el.num) >= 0) {
-                  isKnown = true;
-                  break;
-                }
-              }
-              var numIdx = lineText.indexOf(el.num);
-              if (!isKnown && numIdx > 0) {
-                var beforeNum = lineText.substring(0, numIdx).trim();
-                var beforeWords = beforeNum.split(/\s+/);
-                var lastWord = beforeWords[beforeWords.length - 1] || '';
-                var skipWords = ['fig', 'fig.', 'figure', 'step', 'item', 'no', 'no.', 'number', 'page', 'line', 'claim', 'paragraph', 'section', 'table', 'equation', 'eq', 'ref', 'reference', '(', ')', '-', ''];
-                if (skipWords.indexOf(lastWord.toLowerCase()) < 0 && lastWord.length > 1) {
-                  counts.mismatch++;
-                  ep.range.font.highlightColor = 'Turquoise';
-                }
-              }
-            });
-            return ctx2.sync();
-          });
-        });
       }).then(function() {
-        updateHighlightLegend(counts);
-        var total = counts.official + counts.variant + counts.oldname + counts.mismatch;
-        toast('#' + el.num + ': ' + total + ' matches found');
-      }).catch(function() {
-        // Mismatch detection failed, but Phase 1 is fine
-        updateHighlightLegend(counts);
+        updateHlLegend(counts);
         var total = counts.official + counts.variant + counts.oldname;
-        toast('#' + el.num + ': ' + total + ' matches (mismatch scan skipped)');
+        toast('#' + el.num + ': ' + total + ' matches');
       });
-    }).catch(function(e) {
-      toast('Highlight error: ' + e.message);
-    });
+    }).catch(function(e) { toast('Highlight error: ' + e.message); });
   };
 
   if (highlightedElemId) {
@@ -731,43 +668,31 @@ function highlightElement(elemId) {
 }
 
 function clearElementHighlight(callback) {
-  if (!officeReady || !highlightedElemId) {
-    if (callback) callback();
-    return;
-  }
+  if (!officeReady || !highlightedElemId) { if (callback) callback(); return; }
   var el = elems.find(function(e) { return e.id === highlightedElemId; });
   if (!el) { highlightedElemId = null; if (callback) callback(); return; }
 
   Word.run(function(ctx) {
     var body = ctx.document.body;
-    var allSearches = [];
+    var all = [];
 
-    if (el.name && el.name.trim()) {
-      var r1 = body.search(el.name.trim() + ' ' + el.num, { matchCase: false, matchWholeWord: false });
-      r1.load('items');
-      allSearches.push(r1);
+    if (el.name) {
+      var r1 = body.search(el.name + ' ' + el.num, { matchCase: false, matchWholeWord: false });
+      r1.load('items'); all.push(r1);
     }
     el.variants.forEach(function(v) {
-      if (v && v.trim()) {
-        var rv = body.search(v.trim() + ' ' + el.num, { matchCase: false, matchWholeWord: false });
-        rv.load('items');
-        allSearches.push(rv);
-      }
+      if (!v) return;
+      var rv = body.search(v + ' ' + el.num, { matchCase: false, matchWholeWord: false });
+      rv.load('items'); all.push(rv);
     });
     el.oldNames.forEach(function(o) {
-      if (o && o.trim()) {
-        var ro = body.search(o.trim() + ' ' + el.num, { matchCase: false, matchWholeWord: false });
-        ro.load('items');
-        allSearches.push(ro);
-      }
+      if (!o) return;
+      var ro = body.search(o + ' ' + el.num, { matchCase: false, matchWholeWord: false });
+      ro.load('items'); all.push(ro);
     });
-    // Also clear any mismatch highlights on the bare number
-    var rn = body.search(el.num, { matchCase: false, matchWholeWord: true });
-    rn.load('items');
-    allSearches.push(rn);
 
     return ctx.sync().then(function() {
-      allSearches.forEach(function(r) {
+      all.forEach(function(r) {
         r.items.forEach(function(item) { item.font.highlightColor = 'NoHighlight'; });
       });
       return ctx.sync();
@@ -775,26 +700,19 @@ function clearElementHighlight(callback) {
       highlightedElemId = null;
       if (callback) callback();
     });
-  }).catch(function() {
-    highlightedElemId = null;
-    if (callback) callback();
-  });
+  }).catch(function() { highlightedElemId = null; if (callback) callback(); });
 }
 
-function updateHighlightLegend(counts) {
-  var container = document.getElementById('hlLegend');
-  if (!container) return;
-  if (!counts) {
-    container.style.display = 'none';
-    return;
-  }
-  container.style.display = 'block';
-  container.innerHTML =
+function updateHlLegend(counts) {
+  var c = document.getElementById('hlLegend');
+  if (!c) return;
+  if (!counts) { c.style.display = 'none'; return; }
+  c.style.display = 'block';
+  c.innerHTML =
     '<div class="hl-legend-title">Highlight Results</div>' +
     '<div class="hl-legend-row"><div class="hl-legend-dot" style="background:#00ff00"></div>Official<div class="hl-legend-cnt">' + counts.official + '</div></div>' +
     '<div class="hl-legend-row"><div class="hl-legend-dot" style="background:#ffff00"></div>Variant<div class="hl-legend-cnt">' + counts.variant + '</div></div>' +
-    '<div class="hl-legend-row"><div class="hl-legend-dot" style="background:#ff69b4"></div>Old Name<div class="hl-legend-cnt">' + counts.oldname + '</div></div>' +
-    '<div class="hl-legend-row"><div class="hl-legend-dot" style="background:#40e0d0"></div>Mismatch<div class="hl-legend-cnt">' + counts.mismatch + '</div></div>';
+    '<div class="hl-legend-row"><div class="hl-legend-dot" style="background:#ff69b4"></div>Old Name<div class="hl-legend-cnt">' + counts.oldname + '</div></div>';
 }
 
 // ============================================================
@@ -802,9 +720,6 @@ function updateHighlightLegend(counts) {
 // ============================================================
 function runInspection() {
   if (!officeReady) { toast('Not connected to Word'); return; }
-
-  // Clear any element-level highlight first
-  highlightedElemId = null;
 
   var issues = [];
   var totalMatches = 0;
@@ -817,30 +732,22 @@ function runInspection() {
       el.refs = 0;
       el.issues = 0;
 
-      // Skip elements with missing or empty name/num
-      if (!el.num || !el.num.trim()) return;
-      if (!el.name || !el.name.trim()) return;
-
-      var officialPattern = el.name.trim() + ' ' + el.num.trim();
-      if (officialPattern.length < 3) return;
+      if (!el.name || !el.num) return;
+      var officialPattern = el.name + ' ' + el.num;
       var results = body.search(officialPattern, { matchCase: false, matchWholeWord: false });
       results.load('items');
       promises.push({ elem: el, type: 'official', results: results });
 
       el.variants.forEach(function(v) {
-        if (!v || !v.trim()) return;
-        var vPattern = v.trim() + ' ' + el.num.trim();
-        if (vPattern.length < 3) return;
-        var vResults = body.search(vPattern, { matchCase: false, matchWholeWord: false });
+        if (!v) return;
+        var vResults = body.search(v + ' ' + el.num, { matchCase: false, matchWholeWord: false });
         vResults.load('items');
         promises.push({ elem: el, type: 'variant', results: vResults, variant: v });
       });
 
       el.oldNames.forEach(function(old) {
-        if (!old || !old.trim()) return;
-        var oPattern = old.trim() + ' ' + el.num.trim();
-        if (oPattern.length < 3) return;
-        var oResults = body.search(oPattern, { matchCase: false, matchWholeWord: false });
+        if (!old) return;
+        var oResults = body.search(old + ' ' + el.num, { matchCase: false, matchWholeWord: false });
         oResults.load('items');
         promises.push({ elem: el, type: 'oldname', results: oResults, oldName: old });
       });
@@ -931,32 +838,21 @@ function showInspectionResults(issues, matches) {
 function clearHighlights() {
   if (!officeReady) { toast('Not connected to Word'); return; }
 
-  highlightedElemId = null;
-  updateHighlightLegend(null);
-
   Word.run(function(ctx) {
     var body = ctx.document.body;
     var allSearches = [];
 
     elems.forEach(function(el) {
-      if (!el.name || !el.name.trim() || !el.num || !el.num.trim()) return;
-      var patterns = [el.name.trim() + ' ' + el.num.trim()];
-      el.variants.forEach(function(v) { if (v && v.trim()) patterns.push(v.trim() + ' ' + el.num.trim()); });
-      el.oldNames.forEach(function(o) { if (o && o.trim()) patterns.push(o.trim() + ' ' + el.num.trim()); });
+      if (!el.name || !el.num) return;
+      var patterns = [el.name + ' ' + el.num];
+      el.variants.forEach(function(v) { if (v) patterns.push(v + ' ' + el.num); });
+      el.oldNames.forEach(function(o) { if (o) patterns.push(o + ' ' + el.num); });
 
       patterns.forEach(function(p) {
-        if (p.length < 3) return;
         var r = body.search(p, { matchCase: false, matchWholeWord: false });
         r.load('items');
         allSearches.push(r);
       });
-
-      // Also clear bare number highlights (mismatch)
-      if (el.num.trim().length > 0) {
-        var rn = body.search(el.num.trim(), { matchCase: false, matchWholeWord: true });
-        rn.load('items');
-        allSearches.push(rn);
-      }
     });
 
     return ctx.sync().then(function() {
@@ -1204,23 +1100,20 @@ function sel_elem(id) {
   }
   h += '</div>';
 
-  // Highlight legend
+  // Highlight legend (shown after clicking ■ button)
   h += '<div class="hl-legend" id="hlLegend" style="display:none"></div>';
 
   var confirmStyle = e.status === 'confirmed' ? 'background:#16a34a' : 'background:#2563eb';
   var confirmText = e.status === 'confirmed' ? 'Confirmed' : 'Confirm Element';
-  h += '<div class="fg" style="margin-top:6px"><button class="add-btn" style="width:100%;padding:6px;font-size:9px;' + confirmStyle + '" onclick="confirmElem(\'' + e.id + '\')">' + confirmText + '</button></div>';
+  h += '<div class="fg" style="margin-top:4px"><button class="add-btn" style="width:100%;padding:6px;font-size:9px;' + confirmStyle + '" onclick="confirmElem(\'' + e.id + '\')">' + confirmText + '</button></div>';
 
   inner.innerHTML = h;
   document.getElementById('detailPanel').className = 'detail open';
 }
 
 function closeDetail() {
-  // Clear element highlight when closing detail
   if (highlightedElemId) {
-    clearElementHighlight(function() {
-      updateHighlightLegend(null);
-    });
+    clearElementHighlight(function() { updateHlLegend(null); });
   }
   document.getElementById('detailPanel').className = 'detail';
   selId = null;
@@ -1281,9 +1174,6 @@ function deleteElem(id) {
   var e = elems.find(function(x) { return x.id === id; });
   if (!e) return;
   if (!confirm('Delete ' + e.name + ' ' + e.num + '?')) return;
-  if (highlightedElemId === id) {
-    clearElementHighlight(null);
-  }
   elems = elems.filter(function(x) { return x.id !== id; });
   closeDetail();
   save(); render();
@@ -1381,7 +1271,6 @@ function clearAllData() {
   if (!confirm('Delete ALL elements and figures? This cannot be undone.')) return;
   elems = [];
   figures = [];
-  highlightedElemId = null;
   save(); saveFigures(); render(); renderFigures();
   closeDetail();
   toast('All data cleared');
