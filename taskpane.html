@@ -115,6 +115,81 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 
 /* Scrollbar */
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--brd2);border-radius:2px}
+
+/* Element Config Sections */
+.ec-section{border:1px solid var(--brd);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
+.ec-section-title{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--bg3);cursor:pointer;user-select:none;font-size:10px;font-weight:600;color:var(--tx)}
+.ec-section-title:hover{background:var(--bg4)}
+.ec-arrow{font-size:8px;transition:transform .15s;display:inline-block;color:var(--tx3)}
+.ec-arrow.closed{transform:rotate(-90deg)}
+.ec-label{flex:1}
+.ec-count{font-size:9px;font-family:monospace;color:var(--tx3);background:var(--bg);padding:1px 6px;border-radius:8px}
+.ec-section-body{padding:6px 8px}
+.ec-section-body.collapsed{display:none}
+
+/* Category headers inside sections */
+.ec-cat-header{display:flex;align-items:center;gap:5px;padding:5px 6px;cursor:pointer;user-select:none;font-size:9px;font-weight:600;color:var(--tx2);border-radius:3px}
+.ec-cat-header:hover{background:var(--bg3)}
+.ec-cat-body{padding-left:4px}
+.ec-cat-body.collapsed{display:none}
+
+/* Individual config items */
+.ec-skip-item{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:3px;font-size:10px;border-bottom:1px solid var(--bg3)}
+.ec-skip-item:last-child{border-bottom:none}
+.ec-skip-item.disabled{opacity:.45}
+.ec-skip-item:hover{background:var(--bg3)}
+
+/* Toggle/action buttons */
+.ec-toggle{padding:2px 8px;font-size:8px;font-weight:600;border:1px solid var(--brd);border-radius:3px;background:var(--bg);color:var(--tx2);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.ec-toggle:hover{border-color:var(--acc);color:var(--acc)}
+.ec-action-btn{padding:2px 8px;font-size:8px;font-weight:600;border:1px solid var(--acc-brd);border-radius:3px;background:var(--acc-bg);color:var(--acc);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.ec-action-btn:hover{background:var(--acc);color:#fff}
+.ec-action-btn.live{border-color:var(--green-brd);background:var(--green-bg);color:var(--green)}
+.ec-action-btn.live:hover{background:var(--green);color:#fff}
+.ec-action-btn.remove{border-color:rgba(220,38,38,.15);background:var(--red-bg);color:var(--red)}
+.ec-action-btn.remove:hover{background:var(--red);color:#fff}
+
+/* Add row */
+.ec-add-row{display:flex;gap:4px;padding:4px 0}
+.ec-add-input{flex:1;padding:4px 7px;font-size:10px;border:1px solid var(--brd);border-radius:4px;background:var(--bg);color:var(--tx);outline:none;font-family:inherit}
+.ec-add-input:focus{border-color:var(--acc)}
+.ec-add-btn{padding:4px 10px;font-size:9px;font-weight:600;background:var(--acc);color:#fff;border:none;border-radius:4px;cursor:pointer;white-space:nowrap}
+.ec-add-btn:hover{background:var(--acc2)}
+
+/* Chips (user-added words) */
+.ec-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:500;margin:2px 2px 0 0}
+.ec-chip.user-added{background:var(--acc-bg);color:var(--acc);border:1px solid var(--acc-brd)}
+.ec-chip-x{cursor:pointer;opacity:.5;font-size:8px}
+.ec-chip-x:hover{opacity:1}
+
+/* Word list container */
+.ec-word-list{display:flex;flex-wrap:wrap;padding:4px 0}
+
+/* Search in skip words */
+.ec-search-wrap{padding:4px 0}
+.ec-search{width:100%;padding:5px 7px;font-size:10px;border:1px solid var(--brd);border-radius:4px;background:var(--bg);color:var(--tx);outline:none}
+.ec-search:focus{border-color:var(--acc)}
+
+/* Guide card */
+.ec-guide-card{background:var(--acc-bg);border:1px solid var(--acc-brd);border-radius:var(--radius);padding:10px 12px;margin-bottom:10px;position:relative;font-size:10px;line-height:1.6;color:var(--tx)}
+.ec-guide-card h4{font-size:11px;color:var(--acc);margin-bottom:6px}
+.ec-guide-close{position:absolute;top:6px;right:6px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;color:var(--tx3);font-size:10px;border-radius:3px}
+.ec-guide-close:hover{background:var(--bg3)}
+.ec-guide-step{font-weight:600;color:var(--acc)}
+.ec-guide-dim{font-size:9px;color:var(--tx3);margin-top:6px}
+
+/* Config section header */
+.ec-config-header{font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin:12px 0 8px;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
+.ec-config-header::after{content:'';flex:1;height:1px;background:var(--brd)}
+
+/* Match mode & max issues */
+.ec-setting-row{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border:1px solid var(--brd);border-radius:var(--radius);margin-bottom:6px;background:var(--bg2)}
+.ec-setting-label{font-size:10px;color:var(--tx);font-weight:500}
+.ec-setting-value{display:flex;align-items:center;gap:4px}
+.ec-select{padding:3px 6px;font-size:10px;border:1px solid var(--brd);border-radius:4px;background:var(--bg);color:var(--tx);outline:none;font-family:inherit}
+.ec-select:focus{border-color:var(--acc)}
+.ec-num-input{width:48px;padding:3px 6px;font-size:10px;border:1px solid var(--brd);border-radius:4px;background:var(--bg);color:var(--tx);outline:none;text-align:center;font-family:monospace}
+.ec-num-input:focus{border-color:var(--acc)}
 </style>
 </head>
 <body>
@@ -122,7 +197,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.5.0</div>
+  <div class="ver">v0.6.0</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
@@ -201,8 +276,13 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
       <button class="add-btn" style="flex:1;padding:8px;background:var(--bg3);color:var(--tx);border:1px solid var(--brd)" onclick="bulkImport()">Bulk Import</button>
       <button class="add-btn" style="flex:1;padding:8px;background:var(--red-bg);color:var(--red);border:1px solid rgba(220,38,38,.15)" onclick="clearAllData()">Clear All</button>
     </div>
+
+    <!-- Element Detection Settings -->
+    <div class="ec-config-header">Element Detection Settings</div>
+    <div id="ecConfigPanel"></div>
+
     <div style="margin-top:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px">About</div>
-    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.5.0<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
+    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.6.0<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
   </div>
 </div>
 
@@ -677,6 +757,7 @@ function switchTab(id, btn) {
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
   document.getElementById('p-' + id).classList.add('active');
   btn.classList.add('active');
+  if (id === 'config') renderElemConfig();
 }
 
 // ============================================================
@@ -834,32 +915,9 @@ function save() {
   try { localStorage.setItem('pei_elements', JSON.stringify(elems)); } catch(e){}
 }
 
-function exportJSON() {
-  var data = JSON.stringify(elems, null, 2);
-  var blob = new Blob([data], { type: 'application/json' });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url; a.download = 'pei-elements.json'; a.click();
-  URL.revokeObjectURL(url);
-  toast('Exported ' + elems.length + ' elements');
-}
+// exportJSON — overridden in Element Config section below
 
-function importJSON(ev) {
-  var file = ev.target.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      var imported = JSON.parse(e.target.result);
-      if (Array.isArray(imported)) {
-        elems = imported;
-        save(); render();
-        toast('Imported ' + elems.length + ' elements');
-      }
-    } catch(err) { toast('Invalid JSON file'); }
-  };
-  reader.readAsText(file);
-}
+// importJSON — overridden in Element Config section below
 
 function bulkImport() {
   var text = prompt('Paste elements (one per line):\nFormat: "device 50" or "50 device"');
@@ -951,10 +1009,862 @@ function toast(msg) {
 }
 
 // ============================================================
+// ELEMENT CONFIG — Detection & Conflict Settings
+// ============================================================
+var _elemConfig = {
+  disabledSkipWords: [],
+  userSkipWords: [],
+  disabledValidWords: [],
+  userValidWords: [],
+  disabledFpPatterns: [],
+  userFpPatterns: [],
+  disabledStripWords3: [],
+  userStripWords3: [],
+  disabledStripWords5: [],
+  userStripWords5: [],
+  disabledOrdinals: [],
+  userOrdinals: [],
+  matchMode: 'strict',
+  maxIssuesPerElement: 5
+};
+
+var _ecShowGuide = true;
+var _ecOpenSections = {};
+
+// Load from localStorage
+try {
+  var ecSaved = localStorage.getItem('pei_elemConfig');
+  if (ecSaved) {
+    var ecParsed = JSON.parse(ecSaved);
+    for (var k in ecParsed) { if (_elemConfig.hasOwnProperty(k)) _elemConfig[k] = ecParsed[k]; }
+  }
+} catch(e){}
+
+function ecSave() {
+  try { localStorage.setItem('pei_elemConfig', JSON.stringify(_elemConfig)); } catch(e){}
+}
+
+// ---- Default Lists (from Workbench v18) ----
+
+function _getDefaultSkipWords() {
+  return ['figure','figures','fig','figs','claim','claims','step','steps','paragraph','section',
+    'no','nos','about','than','at','least','between','from','over','under','example','embodiment','embodiments',
+    'approximately','preferably','including','comprising','wherein','having','may','can','should',
+    'is','are','was','were','be','been','being','has','had','do','does','did',
+    'will','would','could','shall','might','must',
+    'and','or','but','not','also','then','thus','hence','therefore',
+    'with','into','onto','upon','through','along','across','within','without',
+    'above','below','before','after','during','since','until','toward','towards',
+    'like','such','same','other','another','further','more','less',
+    'where','when','while','which','what','how','that','if','as','so',
+    'reduce','formed','forming','provide','provided','provides',
+    'disposed','arrange','arranged','made','make','used','using','use',
+    'performed','performing','times','time','based','located','placed',
+    'coupled','connected','attached','bonded','defined','configured',
+    'subsequently','directly','against','extending','respectively',
+    'manufacturing','reliability','quantity',
+    'first','second','third','fourth','fifth',
+    'around','across','adjacent','deposited','method','methods',
+    'process','processes','sectional','view','shown','described',
+    'according','referred','herein','generally','typically','substantially',
+    'includes','on','in','by','to','for','of',
+    'january','february','march','april','may','june','july','august','september','october','november','december',
+    'jan','feb','mar','apr','jun','jul','aug','sep','oct','nov','dec',
+    'filed','dated','published','issued','granted','received','submitted','assigned',
+    'minimum','maximum','average','total','approximate','atleast','overall',
+    'temperature','conductivity','resistance','resistivity','thickness','width','height','length','depth',
+    'weight','volume','density','pressure','voltage','frequency','ratio','percentage','degree','degrees',
+    'range','value','amount','number','level','rate','coefficient','factor'];
+}
+
+function _getDefaultValidWords() {
+  return ['substrate','layer','die','wafer','bump','pad','via',
+    'solder','connector','trace','mask','spacer','dielectric','passivation',
+    'package','chip','wire','bond','underfill','encapsulant','pillar',
+    'redistribution','interposer','cavity','trench','electrode','insulator',
+    'photoresist','oxide','nitride','polymer','adhesive','flux','metallization',
+    'controller','processor','sensor','module','interface','unit','array',
+    'battery','coil','antenna','actuator','transducer','amplifier','filter',
+    'regulator','converter','detector','transmitter','receiver','driver','terminal',
+    'housing','cover','frame','bracket','plate','lens','mirror','shutter'];
+}
+
+function _getDefaultFpPatterns() {
+  return [
+    { id:'fp-filed',       label:'"filed [month]"',                           pattern:'\\bfiled\\s+\\w*\\s*$' },
+    { id:'fp-dated',       label:'"dated [month]"',                           pattern:'\\bdated\\s+\\w*\\s*$' },
+    { id:'fp-month',       label:'Month name before number',                  pattern:'\\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\\s*$' },
+    { id:'fp-atleast',     label:'"at least"',                                pattern:'\\bat\\s*least\\s*$' },
+    { id:'fp-atleast2',    label:'"atleast"',                                 pattern:'\\batleast\\s*$' },
+    { id:'fp-lessthan',    label:'"less than"',                               pattern:'\\bless\\s+than\\s*$' },
+    { id:'fp-greaterthan', label:'"greater than"',                            pattern:'\\bgreater\\s+than\\s*$' },
+    { id:'fp-morethan',    label:'"more than"',                               pattern:'\\bmore\\s+than\\s*$' },
+    { id:'fp-nomorethan',  label:'"no more/less/greater than"',               pattern:'\\bno\\s+(?:more|less|greater|fewer)\\s+than\\s*$' },
+    { id:'fp-upto',        label:'"up to"',                                   pattern:'\\bup\\s+to\\s*$' },
+    { id:'fp-approx',      label:'"about/approximately/roughly..."',          pattern:'\\b(?:about|approximately|roughly|around|nearly|substantially)\\s*$' },
+    { id:'fp-propof',      label:'"[property] of"',                           pattern:'\\b(?:conductivity|resistance|resistivity|thickness|temperature|width|height|depth|length|weight|density|pressure|voltage|current|frequency)\\s+of\\s*$' },
+    { id:'fp-propofapx',   label:'"[property] of at least/about"',            pattern:'\\b(?:conductivity|resistance|resistivity|thickness|temperature|width|height|depth|length|weight|density|pressure|voltage|current|frequency)\\s+of\\s+(?:at\\s*least|atleast|about|approximately)\\s*$' },
+    { id:'fp-rangeof',     label:'"range of"',                                pattern:'\\brange\\s+of\\s*$' },
+    { id:'fp-valueof',     label:'"value of"',                                pattern:'\\bvalue\\s+of\\s*$' },
+    { id:'fp-equalto',     label:'"equal to"',                                pattern:'\\bequal\\s+to\\s*$' },
+    { id:'fp-units',       label:'Unit symbols (°C, nm, MHz...)',             pattern:'\\b(?:°C|°F|K|nm|um|μm|mm|cm|m|mK|Hz|kHz|MHz|GHz|ohm|ohms|W\\/mK)\\s*$' }
+  ];
+}
+
+function _getDefaultStripWords3() {
+  return [
+    'the', 'a', 'an', 'said', 'each', 'one',
+    'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth',
+    'eleventh', 'twelfth'
+  ];
+}
+
+function _getDefaultStripWords5() {
+  return [
+    'and', 'or', 'to', 'of', 'in', 'on', 'at', 'by', 'with', 'from', 'for',
+    'into', 'onto', 'upon', 'over', 'under', 'between', 'through', 'around',
+    'respective', 'corresponding', 'given', 'particular', 'selected', 'predetermined',
+    'forming', 'bonding', 'placing', 'covering', 'including', 'comprising', 'having',
+    'using', 'providing', 'connecting', 'attaching', 'depositing', 'disposing'
+  ];
+}
+
+function _getDefaultOrdinals() {
+  return ['first','second','third','fourth','fifth','sixth','seventh',
+    'eighth','ninth','tenth','eleventh','twelfth','each','one','said'];
+}
+
+function _getSkipWordCategories() {
+  return {
+    'Document Structure': ['figure','figures','fig','figs','claim','claims','step','steps','paragraph','section'],
+    'Ordinals': ['no','nos','first','second','third','fourth','fifth'],
+    'Verbs & Participles': ['is','are','was','were','be','been','being','has','had','do','does','did',
+      'will','would','could','shall','might','must','may','can','should',
+      'reduce','formed','forming','provide','provided','provides',
+      'disposed','arrange','arranged','made','make','used','using','use',
+      'performed','performing','includes','including','comprising','having',
+      'coupled','connected','attached','bonded','defined','configured',
+      'extending','deposited','described','shown','referred'],
+    'Measurements & Properties': ['temperature','conductivity','resistance','resistivity','thickness','width',
+      'height','length','depth','weight','volume','density','pressure','voltage',
+      'frequency','ratio','percentage','degree','degrees',
+      'range','value','amount','number','level','rate','coefficient','factor',
+      'minimum','maximum','average','total','approximate','atleast','overall','quantity'],
+    'Dates & Time': ['january','february','march','april','june','july','august','september',
+      'october','november','december','jan','feb','mar','apr','jun','jul','aug',
+      'sep','oct','nov','dec','filed','dated','published','issued','granted',
+      'received','submitted','assigned','times','time'],
+    'Patent Terms': ['example','embodiment','embodiments','method','methods','process','processes',
+      'sectional','view','manufacturing','reliability','based','located',
+      'placed','according','herein','generally','typically','substantially',
+      'preferably','approximately','subsequently','directly','respectively'],
+    'Prepositions & Conjunctions': ['about','than','at','least','between','from','over','under',
+      'with','into','onto','upon','through','along','across','within','without',
+      'above','below','before','after','during','since','until','toward','towards',
+      'on','in','by','to','for','of','against','around','adjacent',
+      'and','or','but','not','also','then','thus','hence','therefore','wherein'],
+    'Other Stopwords': ['like','such','same','other','another','further','more','less',
+      'where','when','while','which','what','how','that','if','as','so',
+      'may']
+  };
+}
+
+// ---- Active list getters ----
+
+function _getActiveSkipWords() {
+  var defaults = _getDefaultSkipWords();
+  var disabled = {};
+  (_elemConfig.disabledSkipWords || []).forEach(function(w){ disabled[w] = true; });
+  return defaults.filter(function(w){ return !disabled[w]; }).concat(_elemConfig.userSkipWords || []);
+}
+
+function _getActiveValidWords() {
+  var defaults = _getDefaultValidWords();
+  var disabled = {};
+  (_elemConfig.disabledValidWords || []).forEach(function(w){ disabled[w] = true; });
+  return defaults.filter(function(w){ return !disabled[w]; }).concat(_elemConfig.userValidWords || []);
+}
+
+function _getActiveStripWords3() {
+  var defaults = _getDefaultStripWords3();
+  var disabled = {};
+  (_elemConfig.disabledStripWords3 || []).forEach(function(w){ disabled[w] = true; });
+  return defaults.filter(function(w){ return !disabled[w]; }).concat(_elemConfig.userStripWords3 || []);
+}
+
+function _getActiveStripWords5() {
+  var defaults = _getDefaultStripWords5();
+  var disabled = {};
+  (_elemConfig.disabledStripWords5 || []).forEach(function(w){ disabled[w] = true; });
+  return defaults.filter(function(w){ return !disabled[w]; }).concat(_elemConfig.userStripWords5 || []);
+}
+
+function _getActiveOrdinals() {
+  var defaults = _getDefaultOrdinals();
+  var disabled = {};
+  (_elemConfig.disabledOrdinals || []).forEach(function(w){ disabled[w] = true; });
+  return defaults.filter(function(w){ return !disabled[w]; }).concat(_elemConfig.userOrdinals || []);
+}
+
+function _getActiveSkipCount() {
+  return _getDefaultSkipWords().length - (_elemConfig.disabledSkipWords || []).length + (_elemConfig.userSkipWords || []).length;
+}
+
+// ---- HTML Escape ----
+function ecEsc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function ecEscAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+
+// ---- Section toggle ----
+function _ecToggleSec(titleEl) {
+  var body = titleEl.nextElementSibling;
+  var arrow = titleEl.querySelector('.ec-arrow');
+  if (!body) return;
+  var isCollapsing = !body.classList.contains('collapsed');
+  body.classList.toggle('collapsed');
+  if (arrow) arrow.classList.toggle('closed');
+  // Track state
+  var sec = titleEl.closest('[data-sec]');
+  if (sec) {
+    if (isCollapsing) delete _ecOpenSections[sec.dataset.sec];
+    else _ecOpenSections[sec.dataset.sec] = true;
+  }
+  // Auto expand sub-categories when opening large sections
+  if (!isCollapsing && sec && (sec.dataset.sec === 'fppatterns' || sec.dataset.sec === 'skipwords')) {
+    var subs = body.querySelectorAll('.ec-cat-body.collapsed');
+    for (var i = 0; i < subs.length; i++) subs[i].classList.remove('collapsed');
+    var arrows = body.querySelectorAll('.ec-arrow.closed');
+    for (var j = 0; j < arrows.length; j++) arrows[j].classList.remove('closed');
+  }
+}
+
+// ---- Render the config panel ----
+function renderElemConfig() {
+  var panel = document.getElementById('ecConfigPanel');
+  if (!panel) return;
+  var html = '';
+
+  // Guide card
+  if (_ecShowGuide) {
+    html += '<div class="ec-guide-card" id="ecGuideCard">';
+    html += '<button class="ec-guide-close" onclick="ecDismissGuide()" title="Close">✕</button>';
+    html += '<h4>Element Detection & Conflict Checking</h4>';
+    html += '<div style="font-weight:600;color:var(--tx);margin-bottom:4px">1. Element Detection</div>';
+    html += '<div>The engine scans for <span class="ec-guide-step">"word(s) + number"</span> patterns and filters out false positives.</div>';
+    html += '<ol style="margin:4px 0;padding-left:16px">';
+    html += '<li><span class="ec-guide-step">Skip word filter</span> — removes common words (is, and, may...)</li>';
+    html += '<li><span class="ec-guide-step">Valid word check</span> — single-word names must be in the valid list</li>';
+    html += '<li><span class="ec-guide-step">False positive filter</span> — removes phrases like "at least 200"</li>';
+    html += '</ol>';
+    html += '<div style="font-weight:600;color:var(--tx);margin:8px 0 4px">2. Name Consistency Check</div>';
+    html += '<div>Takes the <b>last 5 words before the number</b>, removes ordinals (first, second...), then classifies by article presence.</div>';
+    html += '<ol style="margin:4px 0;padding-left:16px">';
+    html += '<li><span class="ec-guide-step" style="color:#ef4444">⚠ Conflict</span> — core words (excluding articles) differ from representative</li>';
+    html += '<li><span class="ec-guide-step" style="color:#e67e22">⚠ Article</span> — core words match but article differs (a vs the)</li>';
+    html += '<li><span class="ec-guide-step" style="color:#f59e0b">△ Review</span> — words differ from representative (ambiguous boundary)</li>';
+    html += '<li><span class="ec-guide-step" style="color:#22c55e">✓ Primary</span> — matches representative → consistent</li>';
+    html += '</ol>';
+    html += '<div style="font-weight:600;color:var(--tx);margin:8px 0 4px">What you can configure:</div>';
+    html += '<ol style="margin:4px 0;padding-left:16px">';
+    html += '<li><span class="ec-guide-step">Valid Single Words</span> — words recognized as element names on their own</li>';
+    html += '<li><span class="ec-guide-step">False Positive Patterns</span> — phrase patterns that get falsely filtered</li>';
+    html += '<li><span class="ec-guide-step">Ordinals</span> — words removed before comparing names</li>';
+    html += '<li><span class="ec-guide-step">Strip Words Tier 1/2</span> — words stripped during name comparison</li>';
+    html += '<li><span class="ec-guide-step">All Skip Words</span> — full list of words that prevent detection</li>';
+    html += '</ol>';
+    html += '<div class="ec-guide-dim">After changing settings, click <b>Run Inspection</b> to apply.</div>';
+    html += '</div>';
+  }
+
+  // Match Mode + Max Issues
+  html += '<div class="ec-setting-row">';
+  html += '<div class="ec-setting-label">Match Mode</div>';
+  html += '<div class="ec-setting-value"><select class="ec-select" id="ecMatchMode" onchange="ecSetMatchMode(this.value)">';
+  html += '<option value="strict"' + (_elemConfig.matchMode === 'strict' ? ' selected' : '') + '>Strict</option>';
+  html += '<option value="lenient"' + (_elemConfig.matchMode === 'lenient' ? ' selected' : '') + '>Lenient</option>';
+  html += '</select></div></div>';
+
+  html += '<div class="ec-setting-row">';
+  html += '<div class="ec-setting-label">Max Issues / Element</div>';
+  html += '<div class="ec-setting-value"><input type="number" class="ec-num-input" id="ecMaxIssues" value="' + (_elemConfig.maxIssuesPerElement || 5) + '" min="1" max="50" onchange="ecSetMaxIssues(this.value)"></div></div>';
+
+  // Helper for section open/closed state
+  function secOpen(label, count, id) {
+    return '<div class="ec-section" data-sec="' + id + '">' +
+      '<div class="ec-section-title" onclick="_ecToggleSec(this)">' +
+      '<span class="ec-arrow">▼</span><span class="ec-label">' + label + '</span>' +
+      (count !== undefined ? '<span class="ec-count">' + count + '</span>' : '') +
+      '</div><div class="ec-section-body">';
+  }
+  function secClosed(label, count, id) {
+    var wasOpen = _ecOpenSections[id];
+    return '<div class="ec-section" data-sec="' + id + '">' +
+      '<div class="ec-section-title" onclick="_ecToggleSec(this)">' +
+      '<span class="ec-arrow' + (wasOpen ? '' : ' closed') + '">▼</span><span class="ec-label">' + label + '</span>' +
+      (count !== undefined ? '<span class="ec-count">' + count + '</span>' : '') +
+      '</div><div class="ec-section-body' + (wasOpen ? '' : ' collapsed') + '">';
+  }
+  var secEnd = '</div></div>';
+
+  // === Section: Valid Single Words ===
+  var activeValids = _getActiveValidWords();
+  html += secClosed('Valid Single Words', activeValids.length, 'validwords');
+
+  html += '<div style="font-size:9px;color:var(--tx3);padding:2px 0 6px;line-height:1.5">Single-word element names must appear in this list to be detected. Add words like "substrate", "layer", etc.</div>';
+
+  // User-added chips
+  html += '<div class="ec-word-list" id="ecValidWordList">';
+  var uv = _elemConfig.userValidWords || [];
+  for (var vi = 0; vi < uv.length; vi++) {
+    html += '<span class="ec-chip user-added">' + ecEsc(uv[vi]) + ' <span class="ec-chip-x" onmousedown="event.preventDefault();ecRemoveUserValid(\'' + ecEscAttr(uv[vi]) + '\')">✕</span></span>';
+  }
+  html += '</div>';
+
+  // Defaults (with disable toggle)
+  var dv = _getDefaultValidWords();
+  html += '<div class="ec-cat-header" onclick="_ecToggleSec(this)"><span class="ec-arrow closed">▼</span><span class="ec-label">Defaults</span><span class="ec-count">' + dv.length + '</span></div>';
+  html += '<div class="ec-cat-body collapsed">';
+  for (var dvi = 0; dvi < dv.length; dvi++) {
+    var vDis = (_elemConfig.disabledValidWords || []).indexOf(dv[dvi]) >= 0;
+    html += '<div class="ec-skip-item' + (vDis ? ' disabled' : '') + '"><span style="font-size:10px;flex:1">' + ecEsc(dv[dvi]) + '</span>';
+    html += '<button class="ec-toggle" onclick="ecToggleValidDefault(\'' + ecEscAttr(dv[dvi]) + '\')">' + (vDis ? 'Enable' : 'Disable') + '</button></div>';
+  }
+  html += '</div>';
+
+  // Add new valid word
+  html += '<div class="ec-add-row"><input class="ec-add-input" id="ecAddValidInput" placeholder="Add valid word..." onkeydown="if(event.key===\'Enter\')ecAddValidWord()"><button class="ec-add-btn" onmousedown="event.preventDefault();ecAddValidWord()">Add</button></div>';
+  html += secEnd;
+
+  // === Section: False Positive Patterns ===
+  var activeFpCount = _getDefaultFpPatterns().length - (_elemConfig.disabledFpPatterns || []).length + (_elemConfig.userFpPatterns || []).length;
+  html += secClosed('False Positive Patterns', activeFpCount + ' active', 'fppatterns');
+
+  html += '<div style="font-size:9px;color:var(--tx3);padding:2px 0 6px;line-height:1.5">Phrase patterns that match non-element text (like "at least 200"). Disable to allow detection, or add new patterns.</div>';
+
+  // Default patterns — grouped by category
+  var fpCats = {
+    'Date References': ['fp-filed','fp-dated','fp-month'],
+    'Comparisons': ['fp-lessthan','fp-greaterthan','fp-morethan','fp-nomorethan','fp-equalto'],
+    'Numeric Values': ['fp-atleast','fp-atleast2','fp-upto','fp-rangeof','fp-valueof'],
+    'Estimates': ['fp-approx'],
+    'Measurements': ['fp-propof','fp-propofapx'],
+    'Units': ['fp-units']
+  };
+  var allFpDefs = _getDefaultFpPatterns();
+  var fpById = {};
+  for (var fi = 0; fi < allFpDefs.length; fi++) fpById[allFpDefs[fi].id] = allFpDefs[fi];
+
+  var fpCatKeys = Object.keys(fpCats);
+  for (var fci = 0; fci < fpCatKeys.length; fci++) {
+    var fcName = fpCatKeys[fci];
+    var fcIds = fpCats[fcName];
+    var fcDisCount = 0;
+    for (var fdi = 0; fdi < fcIds.length; fdi++) {
+      if ((_elemConfig.disabledFpPatterns || []).indexOf(fcIds[fdi]) >= 0) fcDisCount++;
+    }
+    var fcLabel = fcDisCount > 0 ? (fcIds.length - fcDisCount) + '/' + fcIds.length : '' + fcIds.length;
+
+    html += '<div class="ec-cat-header" onclick="_ecToggleSec(this)"><span class="ec-arrow closed">▼</span><span class="ec-label">' + fcName + '</span><span class="ec-count">' + fcLabel + '</span></div>';
+    html += '<div class="ec-cat-body collapsed">';
+    for (var fii = 0; fii < fcIds.length; fii++) {
+      var fp = fpById[fcIds[fii]];
+      if (!fp) continue;
+      var fpDis = (_elemConfig.disabledFpPatterns || []).indexOf(fp.id) >= 0;
+      html += '<div class="ec-skip-item' + (fpDis ? ' disabled' : '') + '">';
+      html += '<div style="flex:1;min-width:0"><div style="font-size:10px;color:var(--tx)">' + ecEsc(fp.label) + '</div></div>';
+      html += '<button class="ec-toggle" onclick="ecToggleFp(\'' + ecEscAttr(fp.id) + '\')">' + (fpDis ? 'Enable' : 'Disable') + '</button>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  // User-added FP patterns
+  var userFps = _elemConfig.userFpPatterns || [];
+  html += '<div id="ecUserFpHeader" style="margin-top:8px;font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.6px;font-weight:600' + (userFps.length === 0 ? ';display:none' : '') + '">User Added</div>';
+  html += '<div id="ecUserFpList">';
+  for (var ufi = 0; ufi < userFps.length; ufi++) {
+    html += '<div class="ec-skip-item"><div style="flex:1;min-width:0"><div style="font-size:10px;color:var(--tx)">' + ecEsc(userFps[ufi].label) + '</div>';
+    if (userFps[ufi].category) html += '<div style="font-size:8px;color:var(--tx3)">' + ecEsc(userFps[ufi].category) + '</div>';
+    html += '</div><button class="ec-action-btn remove" onclick="ecRemoveUserFp(' + ufi + ')">Remove</button></div>';
+  }
+  html += '</div>';
+
+  // Add new FP pattern
+  html += '<div style="margin-top:8px;font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:4px">Add Pattern</div>';
+  html += '<div class="ec-add-row">';
+  html += '<select class="ec-add-input" id="ecFpCat" style="flex:1;max-width:130px"><option value="">Uncategorized</option><option value="Date References">Date References</option><option value="Comparisons">Comparisons</option><option value="Numeric Values">Numeric Values</option><option value="Estimates">Estimates</option><option value="Measurements">Measurements</option><option value="Units">Units</option></select>';
+  html += '<input class="ec-add-input" id="ecFpPhrase" placeholder="Phrase (e.g. dimension of)" style="flex:2" onkeydown="if(event.key===\'Enter\')ecAddUserFp()">';
+  html += '<button class="ec-add-btn" onmousedown="event.preventDefault();ecAddUserFp()">Add</button></div>';
+  html += secEnd;
+
+  // === Section: Ordinals ===
+  var defaultOrds = _getDefaultOrdinals();
+  var disabledOrds = {};
+  (_elemConfig.disabledOrdinals || []).forEach(function(w){ disabledOrds[w] = true; });
+  var userOrds = _elemConfig.userOrdinals || [];
+  var activeOrdCount = defaultOrds.filter(function(w){ return !disabledOrds[w]; }).length + userOrds.length;
+
+  html += secClosed('Ordinals — removed before comparison', activeOrdCount + ' active', 'ordinals');
+
+  html += '<div style="font-size:9px;color:var(--tx3);padding:2px 0 6px;line-height:1.5">' +
+    'These words are removed from the last 5 words before the number, before comparing names. ' +
+    'Typically ordinals like <b>first</b>, <b>second</b> and determiners like <b>said</b>, <b>each</b>.</div>';
+
+  // Defaults
+  html += '<div class="ec-cat-header" onclick="_ecToggleSec(this)"><span class="ec-arrow closed">▼</span><span class="ec-label">Defaults</span><span class="ec-count">' + defaultOrds.length + '</span></div>';
+  html += '<div class="ec-cat-body collapsed">';
+  for (var oi = 0; oi < defaultOrds.length; oi++) {
+    var oDis = disabledOrds[defaultOrds[oi]];
+    html += '<div class="ec-skip-item' + (oDis ? ' disabled' : '') + '">';
+    html += '<span style="font-size:10px;flex:1">' + defaultOrds[oi] + '</span>';
+    html += '<button class="ec-toggle" onclick="ecToggleOrdinal(\'' + ecEscAttr(defaultOrds[oi]) + '\')"> ' + (oDis ? 'Enable' : 'Disable') + '</button></div>';
+  }
+  html += '</div>';
+
+  // User-added ordinals
+  if (userOrds.length > 0) {
+    html += '<div style="margin:6px 0 4px;font-size:9px;font-weight:600;color:var(--tx2)">User Added</div>';
+    html += '<div class="ec-word-list" id="ecOrdUserList">';
+    for (var uoi = 0; uoi < userOrds.length; uoi++) {
+      html += '<span class="ec-chip user-added">' + ecEsc(userOrds[uoi]) + '<span class="ec-chip-x" onmousedown="event.preventDefault();ecRemoveUserOrdinal(\'' + ecEscAttr(userOrds[uoi]) + '\')">✕</span></span>';
+    }
+    html += '</div>';
+  }
+
+  // Add ordinal
+  html += '<div class="ec-add-row"><input class="ec-add-input" id="ecAddOrdInput" placeholder="Add word..." onkeydown="if(event.key===\'Enter\'){event.preventDefault();ecAddUserOrdinal()}"><button class="ec-add-btn" onmousedown="event.preventDefault();ecAddUserOrdinal()">Add</button></div>';
+  html += secEnd;
+
+  // === Section: Strip Words Tier 1 (3-word) ===
+  var dSW3 = _getDefaultStripWords3();
+  var disSW3 = {};
+  (_elemConfig.disabledStripWords3 || []).forEach(function(w){ disSW3[w] = true; });
+  var uSW3 = _elemConfig.userStripWords3 || [];
+  var activeSW3 = dSW3.filter(function(w){ return !disSW3[w]; }).length + uSW3.length;
+
+  html += secClosed('Strip Words Tier 1 (3-word check)', activeSW3 + ' active', 'strip3');
+
+  html += '<div style="font-size:9px;color:var(--tx3);padding:2px 0 6px;line-height:1.5">Narrow — only articles, ordinals, singular/plural. Stripped when comparing the core 3 words closest to the number. Keep this tight.</div>';
+
+  html += '<div class="ec-cat-header" onclick="_ecToggleSec(this)"><span class="ec-arrow closed">▼</span><span class="ec-label">Defaults</span><span class="ec-count">' + dSW3.length + '</span></div>';
+  html += '<div class="ec-cat-body collapsed">';
+  for (var s3i = 0; s3i < dSW3.length; s3i++) {
+    var s3Dis = disSW3[dSW3[s3i]];
+    html += '<div class="ec-skip-item' + (s3Dis ? ' disabled' : '') + '"><span style="font-size:10px;flex:1">' + ecEsc(dSW3[s3i]) + '</span>';
+    html += '<button class="ec-toggle" onclick="ecToggleStrip3(\'' + ecEscAttr(dSW3[s3i]) + '\')">' + (s3Dis ? 'Enable' : 'Disable') + '</button></div>';
+  }
+  html += '</div>';
+
+  if (uSW3.length > 0) {
+    html += '<div style="margin:6px 0 4px;font-size:9px;font-weight:600;color:var(--tx2)">User Added</div>';
+    html += '<div class="ec-word-list">';
+    for (var us3i = 0; us3i < uSW3.length; us3i++) {
+      html += '<span class="ec-chip user-added">' + ecEsc(uSW3[us3i]) + '<span class="ec-chip-x" onmousedown="event.preventDefault();ecRemoveUserStrip3(\'' + ecEscAttr(uSW3[us3i]) + '\')">✕</span></span>';
+    }
+    html += '</div>';
+  }
+  html += '<div class="ec-add-row"><input class="ec-add-input" id="ecAddStrip3Input" placeholder="Add word..." onkeydown="if(event.key===\'Enter\'){event.preventDefault();ecAddUserStrip3()}"><button class="ec-add-btn" onmousedown="event.preventDefault();ecAddUserStrip3()">Add</button></div>';
+  html += secEnd;
+
+  // === Section: Strip Words Tier 2 (5-word) ===
+  var dSW5 = _getDefaultStripWords5();
+  var disSW5 = {};
+  (_elemConfig.disabledStripWords5 || []).forEach(function(w){ disSW5[w] = true; });
+  var uSW5 = _elemConfig.userStripWords5 || [];
+  var activeSW5 = dSW5.filter(function(w){ return !disSW5[w]; }).length + uSW5.length;
+
+  html += secClosed('Strip Words Tier 2 (5-word check)', activeSW5 + ' active', 'strip5');
+
+  html += '<div style="font-size:9px;color:var(--tx3);padding:2px 0 6px;line-height:1.5">Broad — prepositions, conjunctions, modifiers. Stripped when comparing the 4th-5th words (prefix before core name). Safe to be generous.</div>';
+
+  html += '<div class="ec-cat-header" onclick="_ecToggleSec(this)"><span class="ec-arrow closed">▼</span><span class="ec-label">Defaults</span><span class="ec-count">' + dSW5.length + '</span></div>';
+  html += '<div class="ec-cat-body collapsed">';
+  for (var s5i = 0; s5i < dSW5.length; s5i++) {
+    var s5Dis = disSW5[dSW5[s5i]];
+    html += '<div class="ec-skip-item' + (s5Dis ? ' disabled' : '') + '"><span style="font-size:10px;flex:1">' + ecEsc(dSW5[s5i]) + '</span>';
+    html += '<button class="ec-toggle" onclick="ecToggleStrip5(\'' + ecEscAttr(dSW5[s5i]) + '\')">' + (s5Dis ? 'Enable' : 'Disable') + '</button></div>';
+  }
+  html += '</div>';
+
+  if (uSW5.length > 0) {
+    html += '<div style="margin:6px 0 4px;font-size:9px;font-weight:600;color:var(--tx2)">User Added</div>';
+    html += '<div class="ec-word-list">';
+    for (var us5i = 0; us5i < uSW5.length; us5i++) {
+      html += '<span class="ec-chip user-added">' + ecEsc(uSW5[us5i]) + '<span class="ec-chip-x" onmousedown="event.preventDefault();ecRemoveUserStrip5(\'' + ecEscAttr(uSW5[us5i]) + '\')">✕</span></span>';
+    }
+    html += '</div>';
+  }
+  html += '<div class="ec-add-row"><input class="ec-add-input" id="ecAddStrip5Input" placeholder="Add word..." onkeydown="if(event.key===\'Enter\'){event.preventDefault();ecAddUserStrip5()}"><button class="ec-add-btn" onmousedown="event.preventDefault();ecAddUserStrip5()">Add</button></div>';
+  html += secEnd;
+
+  // === Section: All Skip Words (full list) ===
+  html += secClosed('All Skip Words (full list)', _getActiveSkipCount() + ' active', 'skipwords');
+
+  html += '<div style="font-size:9px;color:var(--tx3);padding:2px 0 6px;line-height:1.5">Words in this list will never be detected as element names. Disable a word to allow it. Add new words to block.</div>';
+
+  html += '<div class="ec-search-wrap"><input class="ec-search" id="ecSkipSearch" placeholder="Search skip words..." oninput="ecFilterSkipList(this.value)"></div>';
+  html += '<div id="ecSkipFullList">';
+  html += _renderSkipWordFullList('');
+  html += '</div>';
+
+  // Add new skip word
+  html += '<div class="ec-add-row"><input class="ec-add-input" id="ecAddSkipInput" placeholder="Add skip word..." onkeydown="if(event.key===\'Enter\'){event.preventDefault();ecAddUserSkip()}"><button class="ec-add-btn" onmousedown="event.preventDefault();ecAddUserSkip()">Add</button></div>';
+
+  html += '<div style="margin-top:8px;display:flex;gap:6px">';
+  html += '<button class="ec-action-btn remove" onclick="ecResetAllConfig()">Reset all to defaults</button>';
+  html += '</div>';
+  html += secEnd;
+
+  panel.innerHTML = html;
+}
+
+// ---- Render skip word full list (with search filter) ----
+function _renderSkipWordFullList(filter) {
+  var categories = _getSkipWordCategories();
+  var allDefaults = _getDefaultSkipWords();
+  var html = '';
+  var lowerFilter = (filter || '').toLowerCase();
+
+  // User-added skip words first
+  var userFiltered = (_elemConfig.userSkipWords || []).filter(function(w) { return !lowerFilter || w.indexOf(lowerFilter) >= 0; });
+  if (userFiltered.length > 0) {
+    html += '<div class="ec-cat-header" onclick="_ecToggleSec(this)"><span class="ec-arrow">▼</span><span class="ec-label">User Added</span><span class="ec-count">' + userFiltered.length + '</span></div>';
+    html += '<div class="ec-cat-body">';
+    for (var i = 0; i < userFiltered.length; i++) {
+      html += '<div class="ec-skip-item"><span style="font-size:10px;flex:1">' + ecEsc(userFiltered[i]) + '</span><span class="ec-chip user-added" style="font-size:8px;padding:1px 4px">user</span><button class="ec-action-btn remove" style="font-size:8px;padding:1px 6px" onclick="ecRemoveUserSkip(\'' + ecEscAttr(userFiltered[i]) + '\')">Remove</button></div>';
+    }
+    html += '</div>';
+  }
+
+  // Categorized defaults
+  var catKeys = Object.keys(categories);
+  var allCategorized = {};
+  for (var ci = 0; ci < catKeys.length; ci++) {
+    var catName = catKeys[ci];
+    var catWords = categories[catName];
+    for (var cw = 0; cw < catWords.length; cw++) allCategorized[catWords[cw]] = true;
+    var filtered = lowerFilter ? catWords.filter(function(w){ return w.indexOf(lowerFilter) >= 0; }) : catWords;
+    if (filtered.length === 0) continue;
+
+    var disCount = 0;
+    for (var dc = 0; dc < filtered.length; dc++) {
+      if ((_elemConfig.disabledSkipWords || []).indexOf(filtered[dc]) >= 0) disCount++;
+    }
+    var countLabel = disCount > 0 ? (filtered.length - disCount) + '/' + filtered.length : '' + filtered.length;
+    var shouldOpen = !!lowerFilter;
+
+    html += '<div class="ec-cat-header" onclick="_ecToggleSec(this)"><span class="ec-arrow' + (shouldOpen ? '' : ' closed') + '">▼</span><span class="ec-label">' + catName + '</span><span class="ec-count">' + countLabel + '</span></div>';
+    html += '<div class="ec-cat-body' + (shouldOpen ? '' : ' collapsed') + '">';
+    for (var fi = 0; fi < filtered.length; fi++) {
+      var isDisabled = (_elemConfig.disabledSkipWords || []).indexOf(filtered[fi]) >= 0;
+      html += '<div class="ec-skip-item' + (isDisabled ? ' disabled' : '') + '">';
+      html += '<span style="font-size:10px;flex:1">' + ecEsc(filtered[fi]) + '</span>';
+      html += '<button class="ec-toggle" onclick="ecToggleSkipDefault(\'' + ecEscAttr(filtered[fi]) + '\')">' + (isDisabled ? 'Enable' : 'Disable') + '</button></div>';
+    }
+    html += '</div>';
+  }
+
+  // Uncategorized
+  var allDefaultsFiltered = lowerFilter ? allDefaults.filter(function(w){ return w.indexOf(lowerFilter) >= 0; }) : allDefaults;
+  var uncategorized = allDefaultsFiltered.filter(function(w){ return !allCategorized[w]; });
+  if (uncategorized.length > 0) {
+    var shouldOpenU = !!lowerFilter;
+    html += '<div class="ec-cat-header" onclick="_ecToggleSec(this)"><span class="ec-arrow' + (shouldOpenU ? '' : ' closed') + '">▼</span><span class="ec-label">Other</span><span class="ec-count">' + uncategorized.length + '</span></div>';
+    html += '<div class="ec-cat-body' + (shouldOpenU ? '' : ' collapsed') + '">';
+    for (var ui = 0; ui < uncategorized.length; ui++) {
+      var uDis = (_elemConfig.disabledSkipWords || []).indexOf(uncategorized[ui]) >= 0;
+      html += '<div class="ec-skip-item' + (uDis ? ' disabled' : '') + '">';
+      html += '<span style="font-size:10px;flex:1">' + ecEsc(uncategorized[ui]) + '</span>';
+      html += '<button class="ec-toggle" onclick="ecToggleSkipDefault(\'' + ecEscAttr(uncategorized[ui]) + '\')">' + (uDis ? 'Enable' : 'Disable') + '</button></div>';
+    }
+    html += '</div>';
+  }
+
+  return html;
+}
+
+function ecFilterSkipList(val) {
+  var container = document.getElementById('ecSkipFullList');
+  if (container) container.innerHTML = _renderSkipWordFullList(val);
+}
+
+// ---- Config actions ----
+
+function ecDismissGuide() {
+  _ecShowGuide = false;
+  var card = document.getElementById('ecGuideCard');
+  if (card) card.remove();
+}
+
+function ecSetMatchMode(val) {
+  _elemConfig.matchMode = val;
+  ecSave();
+  toast('Match mode: ' + val);
+}
+
+function ecSetMaxIssues(val) {
+  var n = parseInt(val) || 5;
+  _elemConfig.maxIssuesPerElement = Math.max(1, Math.min(50, n));
+  ecSave();
+  toast('Max issues: ' + _elemConfig.maxIssuesPerElement);
+}
+
+// --- Valid Words ---
+function ecAddValidWord() {
+  var inp = document.getElementById('ecAddValidInput');
+  if (!inp) return;
+  var word = inp.value.trim().toLowerCase();
+  if (!word) return;
+  if ((_elemConfig.userValidWords || []).indexOf(word) >= 0) { toast('"' + word + '" already added'); return; }
+  if (_getDefaultValidWords().indexOf(word) >= 0) { toast('"' + word + '" is already a default'); return; }
+  _elemConfig.userValidWords.push(word);
+  inp.value = '';
+  ecSave(); renderElemConfig();
+  toast('Added valid word: ' + word);
+}
+
+function ecRemoveUserValid(word) {
+  _elemConfig.userValidWords = (_elemConfig.userValidWords || []).filter(function(w){ return w !== word; });
+  ecSave(); renderElemConfig();
+  toast('Removed: ' + word);
+}
+
+function ecToggleValidDefault(word) {
+  var idx = (_elemConfig.disabledValidWords || []).indexOf(word);
+  if (idx >= 0) {
+    _elemConfig.disabledValidWords.splice(idx, 1);
+  } else {
+    _elemConfig.disabledValidWords.push(word);
+  }
+  ecSave(); renderElemConfig();
+}
+
+// --- False Positive Patterns ---
+function ecToggleFp(id) {
+  var idx = (_elemConfig.disabledFpPatterns || []).indexOf(id);
+  if (idx >= 0) {
+    _elemConfig.disabledFpPatterns.splice(idx, 1);
+  } else {
+    _elemConfig.disabledFpPatterns.push(id);
+  }
+  ecSave(); renderElemConfig();
+}
+
+function ecAddUserFp() {
+  var catEl = document.getElementById('ecFpCat');
+  var phraseEl = document.getElementById('ecFpPhrase');
+  if (!phraseEl) return;
+  var phrase = phraseEl.value.trim();
+  if (!phrase) { toast('Enter a phrase'); return; }
+  var cat = catEl ? catEl.value : '';
+  // Build regex pattern from phrase: escape and add word boundary + trailing space
+  var escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  var pattern = '\\b' + escaped.replace(/\s+/g, '\\s+') + '\\s*$';
+  _elemConfig.userFpPatterns.push({ label: '"' + phrase + '"', pattern: pattern, category: cat || '' });
+  phraseEl.value = '';
+  ecSave(); renderElemConfig();
+  toast('Added FP pattern: ' + phrase);
+}
+
+function ecRemoveUserFp(idx) {
+  (_elemConfig.userFpPatterns || []).splice(idx, 1);
+  ecSave(); renderElemConfig();
+  toast('Removed FP pattern');
+}
+
+// --- Ordinals ---
+function ecToggleOrdinal(word) {
+  var idx = (_elemConfig.disabledOrdinals || []).indexOf(word);
+  if (idx >= 0) {
+    _elemConfig.disabledOrdinals.splice(idx, 1);
+  } else {
+    _elemConfig.disabledOrdinals.push(word);
+  }
+  ecSave(); renderElemConfig();
+}
+
+function ecAddUserOrdinal() {
+  var inp = document.getElementById('ecAddOrdInput');
+  if (!inp) return;
+  var word = inp.value.trim().toLowerCase();
+  if (!word) return;
+  if ((_elemConfig.userOrdinals || []).indexOf(word) >= 0) { toast('"' + word + '" already added'); return; }
+  _elemConfig.userOrdinals.push(word);
+  inp.value = '';
+  ecSave(); renderElemConfig();
+  toast('Added ordinal: ' + word);
+}
+
+function ecRemoveUserOrdinal(word) {
+  _elemConfig.userOrdinals = (_elemConfig.userOrdinals || []).filter(function(w){ return w !== word; });
+  ecSave(); renderElemConfig();
+  toast('Removed: ' + word);
+}
+
+// --- Strip Words Tier 1 ---
+function ecToggleStrip3(word) {
+  var idx = (_elemConfig.disabledStripWords3 || []).indexOf(word);
+  if (idx >= 0) {
+    _elemConfig.disabledStripWords3.splice(idx, 1);
+  } else {
+    _elemConfig.disabledStripWords3.push(word);
+  }
+  ecSave(); renderElemConfig();
+}
+
+function ecAddUserStrip3() {
+  var inp = document.getElementById('ecAddStrip3Input');
+  if (!inp) return;
+  var word = inp.value.trim().toLowerCase();
+  if (!word) return;
+  if ((_elemConfig.userStripWords3 || []).indexOf(word) >= 0) { toast('"' + word + '" already added'); return; }
+  _elemConfig.userStripWords3.push(word);
+  inp.value = '';
+  ecSave(); renderElemConfig();
+  toast('Added strip word (Tier 1): ' + word);
+}
+
+function ecRemoveUserStrip3(word) {
+  _elemConfig.userStripWords3 = (_elemConfig.userStripWords3 || []).filter(function(w){ return w !== word; });
+  ecSave(); renderElemConfig();
+  toast('Removed: ' + word);
+}
+
+// --- Strip Words Tier 2 ---
+function ecToggleStrip5(word) {
+  var idx = (_elemConfig.disabledStripWords5 || []).indexOf(word);
+  if (idx >= 0) {
+    _elemConfig.disabledStripWords5.splice(idx, 1);
+  } else {
+    _elemConfig.disabledStripWords5.push(word);
+  }
+  ecSave(); renderElemConfig();
+}
+
+function ecAddUserStrip5() {
+  var inp = document.getElementById('ecAddStrip5Input');
+  if (!inp) return;
+  var word = inp.value.trim().toLowerCase();
+  if (!word) return;
+  if ((_elemConfig.userStripWords5 || []).indexOf(word) >= 0) { toast('"' + word + '" already added'); return; }
+  _elemConfig.userStripWords5.push(word);
+  inp.value = '';
+  ecSave(); renderElemConfig();
+  toast('Added strip word (Tier 2): ' + word);
+}
+
+function ecRemoveUserStrip5(word) {
+  _elemConfig.userStripWords5 = (_elemConfig.userStripWords5 || []).filter(function(w){ return w !== word; });
+  ecSave(); renderElemConfig();
+  toast('Removed: ' + word);
+}
+
+// --- Skip Words ---
+function ecToggleSkipDefault(word) {
+  var idx = (_elemConfig.disabledSkipWords || []).indexOf(word);
+  if (idx >= 0) {
+    _elemConfig.disabledSkipWords.splice(idx, 1);
+  } else {
+    _elemConfig.disabledSkipWords.push(word);
+  }
+  ecSave();
+  // Re-render just the skip list to preserve search state
+  var searchVal = document.getElementById('ecSkipSearch') ? document.getElementById('ecSkipSearch').value : '';
+  var container = document.getElementById('ecSkipFullList');
+  if (container) container.innerHTML = _renderSkipWordFullList(searchVal);
+}
+
+function ecAddUserSkip() {
+  var inp = document.getElementById('ecAddSkipInput');
+  if (!inp) return;
+  var word = inp.value.trim().toLowerCase();
+  if (!word) return;
+  if ((_elemConfig.userSkipWords || []).indexOf(word) >= 0) { toast('"' + word + '" already added'); return; }
+  if (_getDefaultSkipWords().indexOf(word) >= 0) { toast('"' + word + '" is already a default'); return; }
+  _elemConfig.userSkipWords.push(word);
+  inp.value = '';
+  ecSave();
+  var searchVal = document.getElementById('ecSkipSearch') ? document.getElementById('ecSkipSearch').value : '';
+  var container = document.getElementById('ecSkipFullList');
+  if (container) container.innerHTML = _renderSkipWordFullList(searchVal);
+  toast('Added skip word: ' + word);
+}
+
+function ecRemoveUserSkip(word) {
+  _elemConfig.userSkipWords = (_elemConfig.userSkipWords || []).filter(function(w){ return w !== word; });
+  ecSave();
+  var searchVal = document.getElementById('ecSkipSearch') ? document.getElementById('ecSkipSearch').value : '';
+  var container = document.getElementById('ecSkipFullList');
+  if (container) container.innerHTML = _renderSkipWordFullList(searchVal);
+  toast('Removed: ' + word);
+}
+
+// --- Reset all ---
+function ecResetAllConfig() {
+  if (!confirm('Reset all element detection settings to defaults? This cannot be undone.')) return;
+  _elemConfig = {
+    disabledSkipWords: [], userSkipWords: [],
+    disabledValidWords: [], userValidWords: [],
+    disabledFpPatterns: [], userFpPatterns: [],
+    disabledStripWords3: [], userStripWords3: [],
+    disabledStripWords5: [], userStripWords5: [],
+    disabledOrdinals: [], userOrdinals: [],
+    matchMode: 'strict', maxIssuesPerElement: 5
+  };
+  ecSave(); renderElemConfig();
+  toast('All settings reset to defaults');
+}
+
+// ============================================================
+// Export/Import — include elemConfig in JSON
+// ============================================================
+
+// Override exportJSON to include elemConfig
+function exportJSON() {
+  var data = JSON.stringify({ elements: elems, dict: dict, elemConfig: _elemConfig }, null, 2);
+  var blob = new Blob([data], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'pei-data.json'; a.click();
+  URL.revokeObjectURL(url);
+  toast('Exported ' + elems.length + ' elements + config');
+}
+
+// Override importJSON to handle new format
+function importJSON(ev) {
+  var file = ev.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported)) {
+        // Old format — just elements
+        elems = imported;
+      } else if (imported && imported.elements) {
+        // New format with config
+        elems = imported.elements || [];
+        if (imported.dict) dict = imported.dict;
+        if (imported.elemConfig) {
+          for (var k in imported.elemConfig) {
+            if (_elemConfig.hasOwnProperty(k)) _elemConfig[k] = imported.elemConfig[k];
+          }
+          ecSave();
+        }
+      }
+      save(); saveDict(); render(); renderDict(); renderElemConfig();
+      toast('Imported ' + elems.length + ' elements');
+    } catch(err) { toast('Invalid JSON file'); }
+  };
+  reader.readAsText(file);
+  ev.target.value = '';
+}
+
+// ============================================================
 // INIT
 // ============================================================
 render();
 renderDict();
+renderElemConfig();
 </script>
 </body>
 </html>
