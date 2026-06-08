@@ -211,7 +211,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.6.0</div>
+  <div class="ver">v0.7.0</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
@@ -296,7 +296,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
     <div id="ecConfigPanel"></div>
 
     <div style="margin-top:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px">About</div>
-    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.6.0<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
+    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.7.0<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
   </div>
 </div>
 
@@ -318,34 +318,79 @@ var selId = null, filter = 'all';
 var officeReady = false;
 var qiSelected = -1, qiMatches = [];
 var highlightedElemId = null;
+var docKey = '_default';   // document-specific storage key
+var docName = '';           // display name for statusbar
 
-// Load from localStorage
-try {
-  var saved = localStorage.getItem('pei_elements');
-  if (saved) elems = JSON.parse(saved);
-  var savedDict = localStorage.getItem('pei_dict');
-  if (savedDict) dict = JSON.parse(savedDict);
-} catch(e){}
+// ============================================================
+// DOCUMENT KEY — per-document storage isolation
+// ============================================================
+function makeDocKey(url) {
+  if (!url) return '_default';
+  // Extract filename from path/URL, strip extension, lowercase, replace non-alnum with _
+  var parts = url.replace(/\\/g, '/').split('/');
+  var fname = parts[parts.length - 1] || '';
+  fname = fname.replace(/\.docx?$/i, '').replace(/\.rtf$/i, '').replace(/[^a-zA-Z0-9_\-]/g, '_').toLowerCase();
+  return fname || '_default';
+}
+
+function storageKey(base) {
+  return base + '__' + docKey;
+}
+
+function loadDocData() {
+  elems = []; dict = [];
+  try {
+    var s1 = localStorage.getItem(storageKey('pei_elements'));
+    if (s1) elems = JSON.parse(s1);
+    var s2 = localStorage.getItem(storageKey('pei_dict'));
+    if (s2) dict = JSON.parse(s2);
+  } catch(e){}
+  // elemConfig — also per-document
+  try {
+    var s3 = localStorage.getItem(storageKey('pei_elemConfig'));
+    if (s3) {
+      var parsed = JSON.parse(s3);
+      for (var k in parsed) { if (_elemConfig.hasOwnProperty(k)) _elemConfig[k] = parsed[k]; }
+    }
+  } catch(e){}
+}
 
 // ============================================================
 // OFFICE.JS INIT
 // ============================================================
 Office.onReady(function(info) {
   officeReady = true;
-  document.getElementById('statusDot').className = 'status-dot ok';
-  document.getElementById('statusLabel').textContent = 'Connected to ' + (info.host || 'Word');
-  render();
 
-  // Poll for selection changes (Office.js doesn't have a selection change event for all cases)
+  // Get document URL for per-doc storage
+  try {
+    var url = Office.context.document.url || '';
+    docKey = makeDocKey(url);
+    // Extract display name
+    var parts = url.replace(/\\/g, '/').split('/');
+    docName = parts[parts.length - 1] || 'Unknown';
+  } catch(e) {
+    docKey = '_default';
+    docName = '';
+  }
+
+  loadDocData();
+
+  document.getElementById('statusDot').className = 'status-dot ok';
+  document.getElementById('statusLabel').textContent = docName || ('Connected to ' + (info.host || 'Word'));
+  render(); renderDict(); renderElemConfig();
+
+  // Poll for selection changes
   setInterval(checkSelection, 1500);
 });
 
 // Fallback if Office.js not available (testing outside Word)
 setTimeout(function(){
   if (!officeReady) {
+    docKey = '_default';
+    loadDocData();
     document.getElementById('statusDot').className = 'status-dot err';
     document.getElementById('statusLabel').textContent = 'Standalone mode (no Word)';
-    render();
+    render(); renderDict(); renderElemConfig();
   }
 }, 3000);
 
@@ -928,7 +973,7 @@ function addManual() {
 // PERSISTENCE
 // ============================================================
 function save() {
-  try { localStorage.setItem('pei_elements', JSON.stringify(elems)); } catch(e){}
+  try { localStorage.setItem(storageKey('pei_elements'), JSON.stringify(elems)); } catch(e){}
 }
 
 // exportJSON — overridden in Element Config section below
@@ -936,24 +981,25 @@ function save() {
 // importJSON — overridden in Element Config section below
 
 function bulkImport() {
-  var text = prompt('Paste elements (one per line):\nFormat: "device 50" or "50 device"');
-  if (!text) return;
-  var lines = text.split('\n');
-  var count = 0;
-  for (var i = 0; i < lines.length; i++) {
-    var line = lines[i].trim();
-    if (!line) continue;
-    var m = line.match(/^(.+?)\s+(\d{2,4}[A-Za-z]?)$/i) || line.match(/^(\d{2,4}[A-Za-z]?)\s+(.+)$/i);
-    if (!m) continue;
-    var num, name;
-    if (/^\d/.test(m[1])) { num = m[1]; name = m[2]; } else { name = m[1]; num = m[2]; }
-    name = name.toLowerCase().trim();
-    if (elems.find(function(e) { return e.num === num; })) continue;
-    elems.push({ id: 'e' + num, num: num, name: name, variants: [], oldNames: [], source: 'bulk', status: 'auto', refs: 0, issues: 0 });
-    count++;
-  }
-  save(); render();
-  toast('Imported ' + count + ' elements');
+  peiPrompt('Paste elements (one per line):<br><span style="font-size:9px;color:var(--tx3)">Format: "device 50" or "50 device"</span>', function(text) {
+    if (!text) return;
+    var lines = text.split('\n');
+    var count = 0;
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line) continue;
+      var m = line.match(/^(.+?)\s+(\d{2,4}[A-Za-z]?)$/i) || line.match(/^(\d{2,4}[A-Za-z]?)\s+(.+)$/i);
+      if (!m) continue;
+      var num, name;
+      if (/^\d/.test(m[1])) { num = m[1]; name = m[2]; } else { name = m[1]; num = m[2]; }
+      name = name.toLowerCase().trim();
+      if (elems.find(function(e) { return e.num === num; })) continue;
+      elems.push({ id: 'e' + num, num: num, name: name, variants: [], oldNames: [], source: 'bulk', status: 'auto', refs: 0, issues: 0 });
+      count++;
+    }
+    save(); render();
+    toast('Imported ' + count + ' elements');
+  });
 }
 
 function clearAllData() {
@@ -971,7 +1017,7 @@ function clearAllData() {
 // DICTIONARY
 // ============================================================
 function saveDict() {
-  try { localStorage.setItem('pei_dict', JSON.stringify(dict)); } catch(e){}
+  try { localStorage.setItem(storageKey('pei_dict'), JSON.stringify(dict)); } catch(e){}
 }
 
 function addDictEntry() {
@@ -1049,6 +1095,26 @@ function peiConfirmClose() {
   modal.innerHTML = '';
 }
 
+// Custom prompt dialog (Office Add-in blocks native prompt())
+function peiPrompt(msg, onOk) {
+  var modal = document.getElementById('confirmModal');
+  modal.innerHTML = '<div class="confirm-overlay" onclick="peiConfirmClose()">' +
+    '<div class="confirm-box" onclick="event.stopPropagation()" style="max-width:340px">' +
+    '<div class="confirm-msg">' + msg + '</div>' +
+    '<textarea id="promptTextarea" style="width:100%;height:120px;padding:6px 8px;font-size:10px;font-family:\'Cascadia Code\',monospace;border:1px solid var(--brd2);border-radius:4px;background:var(--bg);color:var(--tx);outline:none;resize:vertical;margin-bottom:10px" placeholder="substrate 100&#10;first semiconductor die 200&#10;redistribution layer 300"></textarea>' +
+    '<div class="confirm-btns">' +
+    '<button class="confirm-cancel" onclick="peiConfirmClose()">Cancel</button>' +
+    '<button class="confirm-ok blue" id="promptOkBtn">Import</button>' +
+    '</div></div></div>';
+  modal.style.display = 'block';
+  document.getElementById('promptTextarea').focus();
+  document.getElementById('promptOkBtn').onclick = function() {
+    var val = document.getElementById('promptTextarea').value;
+    peiConfirmClose();
+    if (onOk) onOk(val);
+  };
+}
+
 // ============================================================
 // ELEMENT CONFIG — Detection & Conflict Settings
 // ============================================================
@@ -1072,17 +1138,10 @@ var _elemConfig = {
 var _ecShowGuide = true;
 var _ecOpenSections = {};
 
-// Load from localStorage
-try {
-  var ecSaved = localStorage.getItem('pei_elemConfig');
-  if (ecSaved) {
-    var ecParsed = JSON.parse(ecSaved);
-    for (var k in ecParsed) { if (_elemConfig.hasOwnProperty(k)) _elemConfig[k] = ecParsed[k]; }
-  }
-} catch(e){}
+// elemConfig is loaded in loadDocData() — no inline load needed here
 
 function ecSave() {
-  try { localStorage.setItem('pei_elemConfig', JSON.stringify(_elemConfig)); } catch(e){}
+  try { localStorage.setItem(storageKey('pei_elemConfig'), JSON.stringify(_elemConfig)); } catch(e){}
 }
 
 // ---- Default Lists (from Workbench v18) ----
