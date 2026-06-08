@@ -119,7 +119,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.2</div>
+  <div class="ver">v0.3</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
@@ -169,7 +169,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
     </div>
     <div style="margin-top:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px">About</div>
-    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.2<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
+    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.3<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
   </div>
 </div>
 
@@ -324,7 +324,7 @@ function runInspection() {
             p.elem.refs += count;
             totalMatches += count;
             // Green highlight
-            p.results.items.forEach(function(r) { r.font.highlightColor = 'BrightGreen'; });
+            p.results.items.forEach(function(r) { r.font.highlightColor = 'Lime'; });
           } else if (p.type === 'variant') {
             p.elem.refs += count;
             totalMatches += count;
