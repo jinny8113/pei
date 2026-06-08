@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -8,7 +8,7 @@
 <meta http-equiv="Expires" content="0">
 <script>
 // Force cache bust — change PEI_VER on each deploy
-var PEI_VER = '093';
+var PEI_VER = '094';
 try {
   if (!sessionStorage.getItem('pei_loaded_' + PEI_VER)) {
     sessionStorage.clear();
@@ -229,7 +229,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 <div class="header">
   <div class="icon">P</div>
   <div class="title">Patent Element Inspector</div>
-  <div class="ver">v0.9.3</div>
+  <div class="ver">v0.9.4</div>
   <div class="status-dot" id="statusDot"></div>
 </div>
 
@@ -315,7 +315,7 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
     <div id="ecConfigPanel"></div>
 
     <div style="margin-top:12px;font-size:10px;font-weight:600;text-transform:uppercase;color:var(--tx2);margin-bottom:8px">About</div>
-    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.9.3<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
+    <div style="font-size:10px;color:var(--tx2)">Patent Element Inspector v0.9.4<br>Office Add-in for Word<br>Register, manage, and inspect patent elements.</div>
   </div>
 </div>
 
@@ -1209,8 +1209,6 @@ function clearHighlights() {
   Word.run(function(ctx) {
     var body = ctx.document.body;
 
-    // Clear ALL highlights by searching for known highlight colors
-    // Office.js doesn't have a "clear all highlights" API, so we search all registered patterns + conflict patterns
     var allSearches = [];
 
     elems.forEach(function(el) {
@@ -1225,8 +1223,15 @@ function clearHighlights() {
       });
     });
 
-    // Also search with a broad pattern to catch conflict highlights
-    // Use "number" pattern to find any "word(s) + 2-4 digit number" — covers all elements
+    // Also clear conflict-highlighted text from inspection results
+    (_inspIssues || []).forEach(function(iss) {
+      if (iss.searchText) {
+        var r = body.search(iss.searchText, { matchCase: false });
+        r.load('items');
+        allSearches.push(r);
+      }
+    });
+
     var broadPat = body.search('[0-9][0-9]', { matchCase: false, matchWholeWord: false, matchWildcards: false });
     broadPat.load('items');
     allSearches.push(broadPat);
@@ -1238,7 +1243,25 @@ function clearHighlights() {
       return ctx.sync();
     }).then(function() {
       _lastScrollMarked = null;
-      toast('Highlights cleared');
+
+      // Clear inspection results UI
+      _inspIssues = [];
+      _inspMatches = 0;
+      _issueFilter = 'all';
+      document.getElementById('inspSummary').style.display = 'none';
+      document.getElementById('inspSummary').innerHTML = '';
+      document.getElementById('issueFilterBar').style.display = 'none';
+      document.getElementById('issueFilterBar').innerHTML = '';
+      document.getElementById('issueList').innerHTML = '';
+      var badge = document.getElementById('inspBadge');
+      badge.style.display = 'none';
+      badge.textContent = '';
+
+      // Reset element issue counts
+      elems.forEach(function(el) { el.refs = 0; el.issues = 0; });
+      save(); render();
+
+      toast('All cleared');
     });
   }).catch(function(e) { toast('Clear error: ' + e.message); });
 }
